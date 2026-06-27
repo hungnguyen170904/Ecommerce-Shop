@@ -1,12 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Search, Menu, Bell, HelpCircle, Globe, ChevronDown, Heart } from 'lucide-react';
+import { ShoppingCart, Search, Menu, Bell, HelpCircle, Globe, ChevronDown, Heart, Store } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
+import { useSettingsStore } from '../store/useSettingsStore';
 import { useEffect, useState } from 'react';
 
 export function Navbar() {
   const user = useAuthStore((state) => state.user);
   const { itemCount, fetchCart } = useCartStore();
+  const settings = useSettingsStore((state) => state.settings);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -56,11 +58,21 @@ export function Navbar() {
         <div className="flex justify-between items-center h-20 gap-4 lg:gap-12">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-              <span className="text-indigo-600 font-extrabold text-2xl leading-none">E</span>
-            </div>
+            {settings?.logoUrl ? (
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center overflow-hidden p-1 shadow-sm">
+                <img 
+                  src={settings.logoUrl.startsWith('/') ? `http://localhost:3000${settings.logoUrl}` : settings.logoUrl} 
+                  alt="Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                <Store className="w-6 h-6 text-indigo-600" />
+              </div>
+            )}
             <span className="font-bold text-2xl tracking-tight text-white hidden sm:block">
-              E-Commerce
+              {settings?.siteName || 'E-Commerce'}
             </span>
           </Link>
 

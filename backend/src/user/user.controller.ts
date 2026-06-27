@@ -21,6 +21,37 @@ export class UserController {
     return this.userService.updateProfile(req.user.userId, data);
   }
 
+  // --- ADDRESS BOOK APIs ---
+  @UseGuards(JwtAuthGuard)
+  @Get('addresses')
+  getAddresses(@Request() req: any) {
+    return this.userService.getAddresses(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('addresses')
+  addAddress(@Request() req: any, @Body() data: any) {
+    return this.userService.addAddress(req.user.userId, data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('addresses/:id')
+  updateAddress(@Request() req: any, @Param('id') id: string, @Body() data: any) {
+    return this.userService.updateAddress(req.user.userId, id, data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('addresses/:id')
+  deleteAddress(@Request() req: any, @Param('id') id: string) {
+    return this.userService.deleteAddress(req.user.userId, id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('addresses/:id/default')
+  setDefaultAddress(@Request() req: any, @Param('id') id: string) {
+    return this.userService.setDefaultAddress(req.user.userId, id);
+  }
+
   // --- ADMIN APIs ---
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)

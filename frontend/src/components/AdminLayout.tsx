@@ -9,13 +9,17 @@ import {
   LogOut,
   Store,
   Tag,
-  FolderTree
+  FolderTree,
+  Archive,
+  ShieldCheck
 } from 'lucide-react';
 import { useEffect } from 'react';
+import { useSettingsStore } from '../store/useSettingsStore';
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
+  const settings = useSettingsStore(state => state.settings);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,7 +35,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { name: 'Tổng quan', path: '/admin', icon: <LayoutDashboard className="w-5 h-5" /> },
     { name: 'Đơn hàng', path: '/admin/orders', icon: <ShoppingCart className="w-5 h-5" /> },
     { name: 'Danh mục', path: '/admin/categories', icon: <FolderTree className="w-5 h-5" /> },
+    { name: 'Nhãn hàng', path: '/admin/brands', icon: <ShieldCheck className="w-5 h-5" /> },
     { name: 'Sản phẩm', path: '/admin/products', icon: <Package className="w-5 h-5" /> },
+    { name: 'Kho hàng', path: '/admin/inventory', icon: <Archive className="w-5 h-5" /> },
     { name: 'Khách hàng', path: '/admin/users', icon: <Users className="w-5 h-5" /> },
     { name: 'Mã giảm giá', path: '/admin/vouchers', icon: <Tag className="w-5 h-5" /> },
     { name: 'Cài đặt', path: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
@@ -47,9 +53,19 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col fixed h-full z-10">
         <div className="h-20 flex items-center px-6 bg-slate-950">
-          <Link to="/" className="flex items-center gap-2 text-white">
-            <Store className="w-8 h-8 text-indigo-500" />
-            <span className="font-bold text-xl tracking-tight">Admin<span className="text-indigo-500">Panel</span></span>
+          <Link to="/" className="flex items-center gap-2 text-white overflow-hidden">
+            {settings?.logoUrl ? (
+              <div className="w-10 h-10 flex-shrink-0 bg-white rounded-lg flex items-center justify-center p-1 overflow-hidden">
+                <img 
+                  src={settings.logoUrl.startsWith('/') ? `http://localhost:3000${settings.logoUrl}` : settings.logoUrl} 
+                  alt="Admin Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ) : (
+              <Store className="w-8 h-8 text-indigo-500 flex-shrink-0" />
+            )}
+            <span className="font-bold text-xl tracking-tight truncate">Admin<span className="text-indigo-500">Panel</span></span>
           </Link>
         </div>
         

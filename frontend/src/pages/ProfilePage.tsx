@@ -10,8 +10,9 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
-  const [activeTab, setActiveTab] = useState<'profile' | 'orders'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses'>('profile');
   const [orders, setOrders] = useState<any[]>([]);
+  const [addresses, setAddresses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   
@@ -19,6 +20,11 @@ export default function ProfilePage() {
     name: user?.name || '',
     phone: '',
     address: ''
+  });
+
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [addressFormData, setAddressFormData] = useState({
+    street: '', city: '', state: '', country: 'VN', zipCode: '', isDefault: false
   });
 
   useEffect(() => {
@@ -32,8 +38,53 @@ export default function ProfilePage() {
   useEffect(() => {
     if (activeTab === 'orders') {
       loadOrders();
+    } else if (activeTab === 'addresses') {
+      loadAddresses();
     }
   }, [activeTab]);
+
+  const loadAddresses = async () => {
+    try {
+      const res = await apiClient.get('/users/addresses');
+      setAddresses(res.data);
+    } catch (error) {
+      console.error('Lỗi tải sổ địa chỉ', error);
+    }
+  };
+
+  const handleAddAddress = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await apiClient.post('/users/addresses', addressFormData);
+      setShowAddressForm(false);
+      setAddressFormData({ street: '', city: '', state: '', country: 'VN', zipCode: '', isDefault: false });
+      loadAddresses();
+      toast.success('Thêm địa chỉ thành công');
+    } catch (error) {
+      toast.error('Lỗi khi thêm địa chỉ');
+    }
+  };
+
+  const handleDeleteAddress = async (id: string) => {
+    if (!confirm('Xóa địa chỉ này?')) return;
+    try {
+      await apiClient.delete(`/users/addresses/${id}`);
+      loadAddresses();
+      toast.success('Đã xóa địa chỉ');
+    } catch (error) {
+      toast.error('Lỗi khi xóa địa chỉ');
+    }
+  };
+
+  const handleSetDefaultAddress = async (id: string) => {
+    try {
+      await apiClient.put(`/users/addresses/${id}/default`);
+      loadAddresses();
+      toast.success('Đã đặt làm mặc định');
+    } catch (error) {
+      toast.error('Lỗi thiết lập mặc định');
+    }
+  };
 
   const loadProfile = async () => {
     try {
@@ -139,6 +190,13 @@ export default function ProfilePage() {
                 >
                   <Package className="w-5 h-5" />
                   Lịch sử mua hàng
+                </button>
+                <button
+                  onClick={() => setActiveTab('addresses')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-colors mt-1 ${activeTab === 'addresses' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}
+                >
+                  <CheckCircle2 className="w-5 h-5" />
+                  Sổ địa chỉ
                 </button>
                 <button
                   onClick={handleLogout}
@@ -270,6 +328,62 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   )}
+                </div>
+              )}
+
+              {activeTab === 'addresses' && (
+                <div className="animate-fade-in">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-bold text-slate-900">Sổ địa chỉ</h2>
+                    <Button onClick={() => setShowAddressForm(true)}>Thêm địa chỉ mới</Button>
+                  </div>
+
+                  {showAddressForm && (
+                    <form onSubmit={handleAddAddress} className="bg-slate-50 p-6 rounded-2xl mb-8 border border-slate-200">
+                      <h3 className="font-semibold mb-4">Thêm địa chỉ mới</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="sm:col-span-2">
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Địa chỉ chi tiết (Số nhà, đường)</label>
+                          <input required type="text" value={addressFormData.street} onChange={e => setAddressFormData({...addressFormData, street: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Phường/Xã, Quận/Huyện</label>
+                          <input required type="text" value={addressFormData.city} onChange={e => setAddressFormData({...addressFormData, city: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Tỉnh/Thành phố</label>
+                          <input required type="text" value={addressFormData.state} onChange={e => setAddressFormData({...addressFormData, state: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500" />
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-3 mt-6">
+                        <Button type="button" variant="outline" onClick={() => setShowAddressForm(false)}>Hủy</Button>
+                        <Button type="submit">Lưu địa chỉ</Button>
+                      </div>
+                    </form>
+                  )}
+
+                  <div className="space-y-4">
+                    {addresses.map(addr => (
+                      <div key={addr.id} className={`p-5 rounded-2xl border ${addr.isDefault ? 'border-indigo-600 bg-indigo-50/50' : 'border-slate-200 bg-white'}`}>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-medium text-slate-900">{addr.street}</p>
+                            <p className="text-slate-600 text-sm mt-1">{addr.city}, {addr.state}, {addr.country}</p>
+                            {addr.isDefault && <span className="inline-block mt-2 px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-md">Mặc định</span>}
+                          </div>
+                          <div className="flex gap-2">
+                            {!addr.isDefault && (
+                              <button onClick={() => handleSetDefaultAddress(addr.id)} className="text-sm font-medium text-indigo-600 hover:text-indigo-700">Đặt mặc định</button>
+                            )}
+                            <button onClick={() => handleDeleteAddress(addr.id)} className="text-sm font-medium text-rose-600 hover:text-rose-700 ml-3">Xóa</button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {addresses.length === 0 && !showAddressForm && (
+                      <div className="text-center py-10 text-slate-500">Bạn chưa có địa chỉ nào trong sổ.</div>
+                    )}
+                  </div>
                 </div>
               )}
 

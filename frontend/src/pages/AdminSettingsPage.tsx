@@ -3,15 +3,21 @@ import { useEffect, useState } from 'react';
 import { apiClient } from '../api/axios';
 import { Settings, Save, Building2, CreditCard, UserCircle } from 'lucide-react';
 import { Button } from '../components/Button';
+import { ImageInput, uploadImageFile } from '../components/ImageInput';
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState({
+    siteName: '',
     bankName: '',
     bankAccount: '',
     bankAccountName: '',
     bannerUrl1: '',
-    bannerUrl2: ''
+    bannerUrl2: '',
+    logoUrl: ''
   });
+  const [bannerFile1, setBannerFile1] = useState<File | null>(null);
+  const [bannerFile2, setBannerFile2] = useState<File | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -24,9 +30,13 @@ export default function AdminSettingsPage() {
     try {
       const response = await apiClient.get('/settings');
       setSettings({
+        siteName: response.data.siteName || '',
         bankName: response.data.bankName || '',
         bankAccount: response.data.bankAccount || '',
         bankAccountName: response.data.bankAccountName || '',
+        bannerUrl1: response.data.bannerUrl1 || '',
+        bannerUrl2: response.data.bannerUrl2 || '',
+        logoUrl: response.data.logoUrl || '',
       });
     } catch (error) {
       console.error('Lỗi khi tải cài đặt', error);
@@ -39,7 +49,26 @@ export default function AdminSettingsPage() {
     e.preventDefault();
     setIsSaving(true);
     try {
-      await apiClient.put('/settings', settings);
+      let finalBanner1 = settings.bannerUrl1;
+      let finalBanner2 = settings.bannerUrl2;
+      let finalLogo = settings.logoUrl;
+
+      if (bannerFile1) {
+        finalBanner1 = await uploadImageFile(bannerFile1);
+      }
+      if (bannerFile2) {
+        finalBanner2 = await uploadImageFile(bannerFile2);
+      }
+      if (logoFile) {
+        finalLogo = await uploadImageFile(logoFile);
+      }
+
+      await apiClient.put('/settings', {
+        ...settings,
+        bannerUrl1: finalBanner1,
+        bannerUrl2: finalBanner2,
+        logoUrl: finalLogo
+      });
       alert('Lưu cài đặt thành công!');
     } catch (error) {
       console.error('Lỗi lưu cài đặt:', error);
@@ -69,6 +98,20 @@ export default function AdminSettingsPage() {
           </div>
         ) : (
           <form onSubmit={handleSave} className="space-y-6">
+            <div className="space-y-1 mb-6">
+              <label className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                <Settings className="w-4 h-4 text-slate-400" /> Tên Cửa Hàng (Site Name)
+              </label>
+              <input 
+                type="text" 
+                placeholder="Ví dụ: My Shop"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 font-medium" 
+                value={settings.siteName}
+                onChange={e => setSettings({...settings, siteName: e.target.value})}
+                required
+              />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1">
                 <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
@@ -122,23 +165,33 @@ export default function AdminSettingsPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Banner 1 (URL Hình ảnh)</label>
-                    <input 
-                      className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-white"
-                      value={settings.bannerUrl1}
-                      onChange={e => setSettings({...settings, bannerUrl1: e.target.value})}
-                      placeholder="https://example.com/banner1.jpg"
+                <div className="space-y-6">
+                  <ImageInput 
+                    label="Logo Hệ thống"
+                    initialUrl={settings.logoUrl}
+                    onImageChange={(url, file) => {
+                      setSettings({...settings, logoUrl: url});
+                      setLogoFile(file);
+                    }}
+                  />
+                  <div className="border-t border-slate-100 pt-4">
+                    <ImageInput 
+                      label="Banner 1"
+                      initialUrl={settings.bannerUrl1}
+                      onImageChange={(url, file) => {
+                        setSettings({...settings, bannerUrl1: url});
+                        setBannerFile1(file);
+                      }}
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Banner 2 (URL Hình ảnh)</label>
-                    <input 
-                      className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-white"
-                      value={settings.bannerUrl2}
-                      onChange={e => setSettings({...settings, bannerUrl2: e.target.value})}
-                      placeholder="https://example.com/banner2.jpg"
+                  <div className="border-t border-slate-100 pt-4">
+                    <ImageInput 
+                      label="Banner 2"
+                      initialUrl={settings.bannerUrl2}
+                      onImageChange={(url, file) => {
+                        setSettings({...settings, bannerUrl2: url});
+                        setBannerFile2(file);
+                      }}
                     />
                   </div>
                 </div>

@@ -4,9 +4,11 @@ import { ShoppingBag, Lock, Mail, User } from 'lucide-react';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { apiClient } from '../api/axios';
+import { useSettingsStore } from '../store/useSettingsStore';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const settings = useSettingsStore((state) => state.settings);
   
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [isLoading, setIsLoading] = useState(false);
@@ -56,9 +58,17 @@ export default function RegisterPage() {
       <div className="w-full max-w-md bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-8 sm:p-10 transition-all">
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 text-indigo-600 mb-6 shadow-sm">
-            <ShoppingBag className="w-8 h-8" />
-          </div>
+          <Link to="/" className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-indigo-50 text-indigo-600 mb-6 shadow-sm overflow-hidden p-2">
+            {settings?.logoUrl ? (
+              <img 
+                src={settings.logoUrl.startsWith('/') ? `http://localhost:3000${settings.logoUrl}` : settings.logoUrl} 
+                alt="Logo" 
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <ShoppingBag className="w-10 h-10" />
+            )}
+          </Link>
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Tạo tài khoản mới</h2>
           <p className="text-sm text-slate-500 mt-2">Bắt đầu trải nghiệm mua sắm tuyệt vời</p>
         </div>

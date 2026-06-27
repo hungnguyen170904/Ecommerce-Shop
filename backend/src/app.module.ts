@@ -12,9 +12,13 @@ import { ReviewModule } from './review/review.module';
 import { UserModule } from './user/user.module';
 import { SettingModule } from './setting/setting.module';
 import { CouponModule } from './coupon/coupon.module';
+import { EmailModule } from './email/email.module';
+import { InventoryModule } from './inventory/inventory.module';
+import { UploadModule } from './upload/upload.module';
+import { BrandModule } from './brand/brand.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ProductModule, CartModule, OrderModule, CategoryModule, ReviewModule, UserModule, SettingModule, CouponModule],
+  imports: [PrismaModule, AuthModule, ProductModule, CartModule, OrderModule, CategoryModule, ReviewModule, UserModule, SettingModule, CouponModule, EmailModule, InventoryModule, UploadModule, BrandModule],
   controllers: [AppController],
   providers: [AppService],
 })

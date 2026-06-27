@@ -23,8 +23,7 @@ export class OrderController {
   // --- API riêng cho User hủy đơn (Nếu đang PENDING) ---
   @Put(':id/cancel')
   async cancelOrder(@Request() req: any, @Param('id') id: string) {
-    // Để an toàn, chỉ user của đơn hàng đó mới được hủy
-    return this.orderService.updateOrderStatus(id, 'CANCELLED');
+    return this.orderService.cancelOrder(req.user.userId, id);
   }
 
   // --- ADMIN APIs ---

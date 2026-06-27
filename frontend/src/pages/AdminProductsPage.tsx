@@ -4,12 +4,14 @@ import { apiClient } from '../api/axios';
 import { Loader2, Package, Search, Plus, Edit2, Trash2 } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
+import { ImageInput, uploadImageFile } from '../components/ImageInput';
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
+  const [brands, setBrands] = useState<any[]>([]);
   const [editingProduct, setEditingProduct] = useState<any>(null);
 
   // Form State
@@ -19,14 +21,27 @@ export default function AdminProductsPage() {
     basePrice: '',
     imageUrl: '',
     categoryId: '',
-    isActive: true
+    brandId: '',
+    isActive: true,
+    variants: [] as any[]
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchProducts();
     fetchCategories();
+    fetchBrands();
   }, []);
+
+  const fetchBrands = async () => {
+    try {
+      const response = await apiClient.get('/brands');
+      setBrands(response.data);
+    } catch (error) {
+      console.error('Lỗi khi tải nhãn hàng', error);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -52,28 +67,47 @@ export default function AdminProductsPage() {
   const handleOpenModal = (product?: any) => {
     if (product) {
       setEditingProduct(product);
+      const prodImage = product.images?.[0]?.url || '';
       setFormData({
         name: product.name,
         description: product.description || '',
         basePrice: product.basePrice.toString(),
-        imageUrl: product.images?.[0]?.url || '',
+        imageUrl: prodImage,
         categoryId: product.categories?.[0]?.categoryId || '',
-        isActive: product.isActive
+        brandId: product.brandId || '',
+        isActive: product.isActive,
+        variants: product.variants || []
       });
+      setImageFile(null);
     } else {
       setEditingProduct(null);
-      setFormData({ name: '', description: '', basePrice: '', imageUrl: '', categoryId: '', isActive: true });
+      setFormData({ name: '', description: '', basePrice: '', imageUrl: '', categoryId: '', brandId: '', isActive: true, variants: [] });
+      setImageFile(null);
     }
     setIsModalOpen(true);
+  };
+
+  const handleImageChange = (url: string, file: File | null) => {
+    setFormData({ ...formData, imageUrl: url });
+    setImageFile(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      let finalImageUrl = formData.imageUrl;
+
+      // Nếu có chọn file mới, tiến hành upload trước
+      if (imageFile) {
+        finalImageUrl = await uploadImageFile(imageFile);
+      }
+
       const payload = {
         ...formData,
-        basePrice: parseFloat(formData.basePrice)
+        imageUrl: finalImageUrl,
+        basePrice: parseFloat(formData.basePrice),
+        brandId: formData.brandId || null
       };
 
       if (editingProduct) {
@@ -99,6 +133,25 @@ export default function AdminProductsPage() {
     } catch (error) {
       console.error('Lỗi xóa sản phẩm:', error);
     }
+  };
+
+  const handleAddVariant = () => {
+    setFormData(prev => ({
+      ...prev,
+      variants: [...prev.variants, { sku: '', size: '', color: '', price: '', isActive: true }]
+    }));
+  };
+
+  const handleVariantChange = (index: number, field: string, value: any) => {
+    const newVariants = [...formData.variants];
+    newVariants[index][field] = value;
+    setFormData({ ...formData, variants: newVariants });
+  };
+
+  const handleRemoveVariant = (index: number) => {
+    const newVariants = [...formData.variants];
+    newVariants.splice(index, 1);
+    setFormData({ ...formData, variants: newVariants });
   };
 
   return (
@@ -149,7 +202,7 @@ export default function AdminProductsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">
                       <img 
-                        src={product.images?.[0]?.url || 'https://via.placeholder.com/150'} 
+                        src={product.images?.[0]?.url ? (product.images[0].url.startsWith('/') ? `http://localhost:3000${product.images[0].url}` : product.images[0].url) : 'https://via.placeholder.com/150'} 
                         alt={product.name} 
                         className="w-12 h-12 rounded-lg object-cover bg-slate-100 border border-slate-200"
                       />
@@ -223,25 +276,39 @@ export default function AdminProductsPage() {
                     value={formData.basePrice}
                     onChange={e => setFormData({...formData, basePrice: e.target.value})}
                   />
-                  <Input 
-                    label="Link Hình ảnh (URL)" 
-                    value={formData.imageUrl}
-                    onChange={e => setFormData({...formData, imageUrl: e.target.value})}
+                  <ImageInput 
+                    initialUrl={formData.imageUrl}
+                    onImageChange={handleImageChange}
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Danh mục</label>
-                  <select
-                    className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-white"
-                    value={formData.categoryId}
-                    onChange={e => setFormData({...formData, categoryId: e.target.value})}
-                  >
-                    <option value="">-- Chọn danh mục --</option>
-                    {categories.map(cat => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Danh mục</label>
+                    <select
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+                      value={formData.categoryId}
+                      onChange={e => setFormData({...formData, categoryId: e.target.value})}
+                    >
+                      <option value="">-- Chọn danh mục --</option>
+                      {categories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Nhãn hàng (Brand)</label>
+                    <select
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+                      value={formData.brandId}
+                      onChange={e => setFormData({...formData, brandId: e.target.value})}
+                    >
+                      <option value="">-- Không chọn --</option>
+                      {brands.map(brand => (
+                        <option key={brand.id} value={brand.id}>{brand.name}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div>
@@ -251,6 +318,78 @@ export default function AdminProductsPage() {
                     value={formData.description}
                     onChange={e => setFormData({...formData, description: e.target.value})}
                   />
+                </div>
+
+                {/* Variants Section */}
+                <div className="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-sm font-bold text-slate-800">Phân loại sản phẩm (Biến thể)</h4>
+                    <Button type="button" variant="outline" size="sm" onClick={handleAddVariant} className="text-xs py-1.5 h-auto">
+                      <Plus className="w-3 h-3 mr-1" /> Thêm loại
+                    </Button>
+                  </div>
+                  
+                  {formData.variants.length === 0 ? (
+                    <div className="text-center text-xs text-slate-400 italic py-4">Chưa có phân loại nào. Khách hàng sẽ mua sản phẩm mặc định.</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {formData.variants.map((variant, index) => (
+                        <div key={index} className="flex gap-2 items-start bg-white p-3 rounded-lg border border-slate-200 shadow-sm relative group">
+                          <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-3">
+                            <div>
+                              <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">Mã SKU *</label>
+                              <input 
+                                type="text" 
+                                required
+                                value={variant.sku}
+                                onChange={e => handleVariantChange(index, 'sku', e.target.value)}
+                                className="w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500"
+                                placeholder="VD: IP15-256-BLACK"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">Màu sắc (Color)</label>
+                              <input 
+                                type="text" 
+                                value={variant.color || ''}
+                                onChange={e => handleVariantChange(index, 'color', e.target.value)}
+                                className="w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500"
+                                placeholder="VD: Đen"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">Dung lượng (Size)</label>
+                              <input 
+                                type="text" 
+                                value={variant.size || ''}
+                                onChange={e => handleVariantChange(index, 'size', e.target.value)}
+                                className="w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500"
+                                placeholder="VD: 256GB"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">Giá bán (Override)</label>
+                              <input 
+                                type="number" 
+                                value={variant.price || ''}
+                                onChange={e => handleVariantChange(index, 'price', e.target.value ? parseFloat(e.target.value) : null)}
+                                className="w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500"
+                                placeholder="Bỏ trống lấy giá gốc"
+                              />
+                            </div>
+                          </div>
+                          <button 
+                            type="button" 
+                            onClick={() => handleRemoveVariant(index)}
+                            className="text-rose-500 p-1 hover:bg-rose-50 rounded mt-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Xóa biến thể"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {editingProduct && (

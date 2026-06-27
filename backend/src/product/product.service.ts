@@ -68,6 +68,7 @@ export class ProductService {
         images: { orderBy: { sortOrder: 'asc' } },
         brand: true,
         categories: { include: { category: true } },
+        variants: { where: { isActive: true } },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -90,6 +91,15 @@ export class ProductService {
         categories: data.categoryId ? {
           create: [{ categoryId: data.categoryId }]
         } : undefined,
+        variants: data.variants?.length > 0 ? {
+          create: data.variants.map((v: any) => ({
+            sku: v.sku,
+            size: v.size || null,
+            color: v.color || null,
+            price: v.price || null,
+            isActive: v.isActive !== false
+          }))
+        } : undefined
       }
     });
   }
@@ -98,19 +108,55 @@ export class ProductService {
     const product = await this.prisma.product.findUnique({ where: { id } });
     if (!product) throw new NotFoundException('Không tìm thấy sản phẩm để cập nhật');
 
-    return this.prisma.product.update({
+    const updatedProduct = await this.prisma.product.update({
       where: { id },
       data: {
         name: data.name,
         description: data.description,
         basePrice: data.basePrice,
+        brandId: data.brandId || null,
         isActive: data.isActive,
         categories: data.categoryId ? {
           deleteMany: {},
           create: [{ categoryId: data.categoryId }]
         } : undefined,
+        images: data.imageUrl ? {
+          deleteMany: {},
+          create: [{ url: data.imageUrl, isPrimary: true }]
+        } : undefined,
       }
     });
+
+    // Handle Variants carefully (Upsert and Soft Delete)
+    if (data.variants && Array.isArray(data.variants)) {
+      const existingVariants = await this.prisma.productVariant.findMany({ where: { productId: id } });
+      const newVariantIds = data.variants.map((v: any) => v.id).filter(Boolean);
+
+      // Soft delete removed variants
+      const variantsToRemove = existingVariants.filter(ev => !newVariantIds.includes(ev.id));
+      for (const v of variantsToRemove) {
+        await this.prisma.productVariant.update({ where: { id: v.id }, data: { isActive: false } });
+      }
+
+      // Upsert provided variants
+      for (const v of data.variants) {
+        if (v.id) {
+          await this.prisma.productVariant.update({
+            where: { id: v.id },
+            data: { sku: v.sku, size: v.size || null, color: v.color || null, price: v.price || null, isActive: v.isActive !== false }
+          });
+        } else {
+          await this.prisma.productVariant.create({
+            data: {
+              productId: id,
+              sku: v.sku, size: v.size || null, color: v.color || null, price: v.price || null, isActive: v.isActive !== false
+            }
+          });
+        }
+      }
+    }
+
+    return updatedProduct;
   }
 
   async deleteProduct(id: string) {

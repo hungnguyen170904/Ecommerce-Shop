@@ -18,6 +18,7 @@ export default function CartPage() {
     phone: '',
     paymentMethod: 'COD'
   });
+  const [userAddresses, setUserAddresses] = useState<any[]>([]);
   const [bankSettings, setBankSettings] = useState<any>(null);
   const [couponCode, setCouponCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
@@ -68,9 +69,19 @@ export default function CartPage() {
         apiClient.get('/users/profile'),
         apiClient.get('/settings')
       ]);
+      
+      const addresses = profileRes.data.addresses || [];
+      setUserAddresses(addresses);
+      
+      let defaultAddrStr = profileRes.data.address || '';
+      if (addresses.length > 0) {
+        const def = addresses[0];
+        defaultAddrStr = `${def.street}, ${def.city}, ${def.state}, ${def.country}`;
+      }
+
       setCheckoutData({
         ...checkoutData,
-        shippingAddress: profileRes.data.address || '',
+        shippingAddress: defaultAddrStr,
         phone: profileRes.data.phone || ''
       });
       setBankSettings(settingsRes.data);
@@ -333,9 +344,27 @@ export default function CartPage() {
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
-                  <MapPin className="w-4 h-4" /> Địa chỉ giao hàng chi tiết
-                </label>
+                <div className="flex justify-between items-end mb-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                    <MapPin className="w-4 h-4" /> Địa chỉ giao hàng chi tiết
+                  </label>
+                  {userAddresses.length > 0 && (
+                    <select 
+                      className="text-sm border-slate-200 rounded-lg text-slate-600 focus:ring-indigo-500 py-1 px-2"
+                      onChange={(e) => {
+                        const addr = userAddresses.find(a => a.id === e.target.value);
+                        if (addr) {
+                          setCheckoutData({...checkoutData, shippingAddress: `${addr.street}, ${addr.city}, ${addr.state}, ${addr.country}`});
+                        }
+                      }}
+                    >
+                      <option value="">-- Chọn từ Sổ địa chỉ --</option>
+                      {userAddresses.map(a => (
+                        <option key={a.id} value={a.id}>{a.street}, {a.city}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
                 <textarea 
                   required
                   placeholder="Nhập số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố"

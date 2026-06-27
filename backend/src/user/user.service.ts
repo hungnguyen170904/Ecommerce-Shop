@@ -16,6 +16,9 @@ export class UserService {
         address: true,
         role: true,
         createdAt: true,
+        addresses: {
+          orderBy: { isDefault: 'desc' }
+        }
       }
     });
     if (!user) throw new NotFoundException('Không tìm thấy người dùng');
@@ -107,10 +110,95 @@ export class UserService {
     });
   }
 
-  // Soft delete or real delete. Let's do a role update or delete.
   async deleteUser(id: string) {
     return this.prisma.user.delete({
       where: { id }
+    });
+  }
+
+  // --- ADDRESS BOOK APIs ---
+  async getAddresses(userId: string) {
+    return this.prisma.address.findMany({
+      where: { userId },
+      orderBy: { isDefault: 'desc' }
+    });
+  }
+
+  async addAddress(userId: string, data: any) {
+    // If this is the first address, make it default
+    const count = await this.prisma.address.count({ where: { userId } });
+    const isDefault = count === 0 ? true : (data.isDefault || false);
+
+    if (isDefault) {
+      await this.prisma.address.updateMany({
+        where: { userId },
+        data: { isDefault: false }
+      });
+    }
+
+    return this.prisma.address.create({
+      data: {
+        userId,
+        street: data.street,
+        city: data.city || '',
+        state: data.state || '',
+        country: data.country || 'VN',
+        zipCode: data.zipCode || '',
+        isDefault
+      }
+    });
+  }
+
+  async updateAddress(userId: string, addressId: string, data: any) {
+    // Verify ownership
+    const address = await this.prisma.address.findUnique({ where: { id: addressId } });
+    if (!address || address.userId !== userId) throw new NotFoundException('Không tìm thấy địa chỉ');
+
+    return this.prisma.address.update({
+      where: { id: addressId },
+      data: {
+        street: data.street,
+        city: data.city,
+        state: data.state,
+        country: data.country,
+        zipCode: data.zipCode
+      }
+    });
+  }
+
+  async deleteAddress(userId: string, addressId: string) {
+    const address = await this.prisma.address.findUnique({ where: { id: addressId } });
+    if (!address || address.userId !== userId) throw new NotFoundException('Không tìm thấy địa chỉ');
+
+    await this.prisma.address.delete({ where: { id: addressId } });
+    
+    // If deleted address was default, set another one as default
+    if (address.isDefault) {
+      const remaining = await this.prisma.address.findFirst({ where: { userId } });
+      if (remaining) {
+        await this.prisma.address.update({
+          where: { id: remaining.id },
+          data: { isDefault: true }
+        });
+      }
+    }
+    return { success: true };
+  }
+
+  async setDefaultAddress(userId: string, addressId: string) {
+    const address = await this.prisma.address.findUnique({ where: { id: addressId } });
+    if (!address || address.userId !== userId) throw new NotFoundException('Không tìm thấy địa chỉ');
+
+    // Reset all
+    await this.prisma.address.updateMany({
+      where: { userId },
+      data: { isDefault: false }
+    });
+
+    // Set new default
+    return this.prisma.address.update({
+      where: { id: addressId },
+      data: { isDefault: true }
     });
   }
 }

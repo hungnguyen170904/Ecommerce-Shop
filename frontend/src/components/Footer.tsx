@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
+import { useSettingsStore } from '../store/useSettingsStore';
+import { Store } from 'lucide-react';
 
 export function Footer() {
+  const settings = useSettingsStore(state => state.settings);
+
   return (
     <footer className="bg-white border-t border-slate-200 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -8,6 +12,24 @@ export function Footer() {
           
           {/* Cột 1 */}
           <div>
+            <Link to="/" className="flex items-center gap-2 mb-6">
+              {settings?.logoUrl ? (
+                <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center overflow-hidden p-1 shadow-sm">
+                  <img 
+                    src={settings.logoUrl.startsWith('/') ? `http://localhost:3000${settings.logoUrl}` : settings.logoUrl} 
+                    alt="Logo" 
+                    className="w-full h-full object-contain filter brightness-0 invert"
+                  />
+                </div>
+              ) : (
+                <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
+                  <Store className="w-6 h-6 text-white" />
+                </div>
+              )}
+              <span className="font-bold text-2xl tracking-tight text-indigo-600">
+                {settings?.siteName || 'E-Commerce'}
+              </span>
+            </Link>
             <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Chăm sóc khách hàng</h3>
             <ul className="space-y-3 text-sm text-slate-600">
               <li><Link to="#" className="hover:text-indigo-600">Trung Tâm Trợ Giúp</Link></li>
@@ -21,11 +43,11 @@ export function Footer() {
 
           {/* Cột 2 */}
           <div>
-            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Về E-Commerce</h3>
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Về {settings?.siteName || 'E-Commerce'}</h3>
             <ul className="space-y-3 text-sm text-slate-600">
-              <li><Link to="#" className="hover:text-indigo-600">Giới Thiệu Về E-Commerce Việt Nam</Link></li>
+              <li><Link to="#" className="hover:text-indigo-600">Giới Thiệu Về {settings?.siteName || 'E-Commerce'}</Link></li>
               <li><Link to="#" className="hover:text-indigo-600">Tuyển Dụng</Link></li>
-              <li><Link to="#" className="hover:text-indigo-600">Điều Khoản E-Commerce</Link></li>
+              <li><Link to="#" className="hover:text-indigo-600">Điều Khoản</Link></li>
               <li><Link to="#" className="hover:text-indigo-600">Chính Sách Bảo Mật</Link></li>
               <li><Link to="#" className="hover:text-indigo-600">Chính Hãng</Link></li>
               <li><Link to="#" className="hover:text-indigo-600">Kênh Người Bán</Link></li>
@@ -73,7 +95,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
-          <p>© 2026 E-Commerce. Tất cả các quyền được bảo lưu.</p>
+          <p>© 2026 {settings?.siteName || 'E-Commerce'}. Tất cả các quyền được bảo lưu.</p>
           <div className="flex gap-4">
             <span>Quốc gia & Khu vực:</span>
             <Link to="#" className="hover:text-indigo-600">Việt Nam</Link>

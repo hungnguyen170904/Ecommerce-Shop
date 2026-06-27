@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import LoginPage from './pages/LoginPage';
@@ -16,8 +16,11 @@ import AdminUsersPage from './pages/AdminUsersPage';
 import AdminSettingsPage from './pages/AdminSettingsPage';
 import AdminVouchersPage from './pages/AdminVouchersPage';
 import AdminCategoriesPage from './pages/AdminCategoriesPage';
+import AdminBrandsPage from './pages/AdminBrandsPage';
+import AdminInventoryPage from './pages/AdminInventoryPage';
 import WishlistPage from './pages/WishlistPage';
 import { useAuthStore } from './store/useAuthStore';
+import { useSettingsStore } from './store/useSettingsStore';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = useAuthStore((state) => state.token);
@@ -28,6 +31,31 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
+  const fetchSettings = useSettingsStore(state => state.fetchSettings);
+  const settings = useSettingsStore(state => state.settings);
+
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
+
+  useEffect(() => {
+    if (settings?.logoUrl) {
+      // Cập nhật Favicon
+      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = settings.logoUrl.startsWith('/') ? `http://localhost:3000${settings.logoUrl}` : settings.logoUrl;
+      
+      // Đổi tiêu đề thay vì Vite
+      document.title = `${settings.siteName} | Storefront`;
+    } else {
+      document.title = settings?.siteName || "Cửa hàng của tôi";
+    }
+  }, [settings]);
+
   return (
     <BrowserRouter>
       <Toaster position="top-right" toastOptions={{ duration: 3000, style: { borderRadius: '12px', background: '#334155', color: '#fff' } }} />
@@ -94,6 +122,14 @@ function App() {
         <Route 
           path="/admin/categories" 
           element={<AdminCategoriesPage />} 
+        />
+        <Route 
+          path="/admin/brands" 
+          element={<AdminBrandsPage />} 
+        />
+        <Route 
+          path="/admin/inventory" 
+          element={<AdminInventoryPage />} 
         />
       </Routes>
     </BrowserRouter>
