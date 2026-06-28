@@ -11,29 +11,51 @@ export default function SearchPage() {
   const query = searchParams.get('q') || '';
   const categoryId = searchParams.get('category') || '';
   
+  const [allProducts, setAllProducts] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
+  const [brands, setBrands] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Advanced Filters State
+  const [selectedBrand, setSelectedBrand] = useState<string>('');
+  const [priceRange, setPriceRange] = useState<{min: string, max: string}>({min: '', max: ''});
+  const [sortBy, setSortBy] = useState<string>('newest');
   
   const navigate = useNavigate();
   const fetchCart = useCartStore(state => state.fetchCart);
 
   useEffect(() => {
-    fetchData();
-  }, [query, categoryId]);
+    fetchInitialData();
+  }, []); // Only fetch once when page loads
 
-  const fetchData = async () => {
+  useEffect(() => {
+    applyFilters();
+  }, [allProducts, query, categoryId, selectedBrand, priceRange, sortBy]);
+
+  const fetchInitialData = async () => {
     setIsLoading(true);
     try {
-      const [prodRes, catRes] = await Promise.all([
-        apiClient.get('/products'), // Ideally we should have a search endpoint, but for now we filter frontend or use backend if available
-        apiClient.get('/categories')
+      const [prodRes, catRes, brandRes] = await Promise.all([
+        apiClient.get('/products'), 
+        apiClient.get('/categories'),
+        apiClient.get('/brands')
       ]);
-      
-      let filtered = prodRes.data;
-      
-      if (query) {
-        const q = query.toLowerCase();
+      setAllProducts(prodRes.data);
+      setCategories(catRes.data);
+      setBrands(brandRes.data);
+    } catch (error) {
+      console.error('Lỗi tải dữ liệu', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const applyFilters = () => {
+    let filtered = [...allProducts];
+
+    if (query) {
+      const q = query.toLowerCase();
         filtered = filtered.filter((p: any) => 
           p.name.toLowerCase().includes(q) || 
           p.description?.toLowerCase().includes(q)
@@ -41,20 +63,32 @@ export default function SearchPage() {
       }
       
       if (categoryId) {
-        // Backend doesn't return categories inside product by default if we use findMany. 
-        // Assuming we need to check if product.categories array contains this categoryId.
         filtered = filtered.filter((p: any) => 
           p.categories?.some((c: any) => c.categoryId === categoryId)
         );
       }
-      
-      setProducts(filtered);
-      setCategories(catRes.data);
-    } catch (error) {
-      console.error('Lỗi tải dữ liệu', error);
-    } finally {
-      setIsLoading(false);
+
+      if (selectedBrand) {
+        filtered = filtered.filter((p: any) => p.brandId === selectedBrand);
+      }
+
+      if (priceRange.min) {
+        filtered = filtered.filter((p: any) => p.basePrice >= parseInt(priceRange.min));
+      }
+      if (priceRange.max) {
+        filtered = filtered.filter((p: any) => p.basePrice <= parseInt(priceRange.max));
+      }
+
+    if (sortBy === 'price_asc') {
+      filtered.sort((a: any, b: any) => a.basePrice - b.basePrice);
+    } else if (sortBy === 'price_desc') {
+      filtered.sort((a: any, b: any) => b.basePrice - a.basePrice);
+    } else {
+      // newest
+      filtered.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
+    
+    setProducts(filtered);
   };
 
   const handleAddToCart = async (product: any) => {
@@ -107,17 +141,91 @@ export default function SearchPage() {
                   ))}
                 </div>
               </div>
+
+              {/* Lọc theo Nhãn hàng */}
+              <div className="pt-4 border-t border-slate-100">
+                <h4 className="text-sm font-medium text-slate-700 mb-3">Nhãn hàng</h4>
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="brand" 
+                      checked={selectedBrand === ''}
+                      onChange={() => setSelectedBrand('')}
+                      className="text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span className="text-sm text-slate-600">Tất cả</span>
+                  </label>
+                  {brands.map(brand => (
+                    <label key={brand.id} className="flex items-center gap-2 cursor-pointer">
+                      <input 
+                        type="radio" 
+                        name="brand" 
+                        checked={selectedBrand === brand.id}
+                        onChange={() => setSelectedBrand(brand.id)}
+                        className="text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="text-sm text-slate-600">{brand.name}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Lọc theo Giá */}
+              <div className="pt-4 border-t border-slate-100">
+                <h4 className="text-sm font-medium text-slate-700 mb-3">Khoảng giá</h4>
+                <div className="flex items-center gap-2 mb-3">
+                  <input 
+                    type="number" 
+                    placeholder="Tối thiểu"
+                    className="w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500"
+                    value={priceRange.min}
+                    onChange={(e) => setPriceRange({...priceRange, min: e.target.value})}
+                  />
+                  <span className="text-slate-400">-</span>
+                  <input 
+                    type="number" 
+                    placeholder="Tối đa"
+                    className="w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500"
+                    value={priceRange.max}
+                    onChange={(e) => setPriceRange({...priceRange, max: e.target.value})}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1 text-xs py-1"
+                    onClick={() => setPriceRange({min: '', max: ''})}
+                  >Xóa</Button>
+                </div>
+              </div>
             </div>
           </div>
         </aside>
 
         {/* Results */}
         <div className="flex-1">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-slate-900">
-              {query ? `Kết quả tìm kiếm cho "${query}"` : categoryId ? 'Danh mục sản phẩm' : 'Tất cả sản phẩm'}
-            </h2>
-            <p className="text-slate-500 mt-1">Tìm thấy {products.length} sản phẩm</p>
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900">
+                {query ? `Kết quả tìm kiếm cho "${query}"` : categoryId ? 'Danh mục sản phẩm' : 'Tất cả sản phẩm'}
+              </h2>
+              <p className="text-slate-500 mt-1">Tìm thấy {products.length} sản phẩm</p>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-slate-500">Sắp xếp:</span>
+              <select 
+                className="px-3 py-2 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-white"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="newest">Mới nhất</option>
+                <option value="price_asc">Giá: Thấp đến Cao</option>
+                <option value="price_desc">Giá: Cao đến Thấp</option>
+              </select>
+            </div>
           </div>
 
           {isLoading ? (
@@ -148,7 +256,7 @@ export default function SearchPage() {
                   </div>
                   
                   <h3 className="font-semibold text-slate-900 line-clamp-2 mb-2 flex-1 text-sm">
-                    <Link to={`/product/${product.id}`} className="hover:text-indigo-600 transition-colors">
+                    <Link to={`/product/${product.slug}`} className="hover:text-indigo-600 transition-colors">
                       {product.name}
                     </Link>
                   </h3>

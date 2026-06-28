@@ -4,13 +4,16 @@ import { Navbar } from '../components/Navbar';
 import { Button } from '../components/Button';
 import { apiClient } from '../api/axios';
 import { useAuthStore } from '../store/useAuthStore';
-import { Loader2, User as UserIcon, Package, LogOut, Clock, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, User as UserIcon, Package, LogOut, Clock, CheckCircle2, XCircle, Gift, Camera, Star, Plus, Minus } from 'lucide-react';
+import toast from 'react-hot-toast';
+import confetti from 'canvas-confetti';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
-  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses'>('profile');
+  const updateUserAvatar = useAuthStore(state => state.updateUserAvatar);
+  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses' | 'rewards'>('profile');
   const [orders, setOrders] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,8 +22,18 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     phone: '',
-    address: ''
+    address: '',
+    points: 0,
+    tier: 'MEMBER',
+    avatarUrl: '',
+    lastCheckIn: null as string | null
   });
+  const [pointHistories, setPointHistories] = useState<any[]>([]);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [addressFormData, setAddressFormData] = useState({
@@ -92,8 +105,15 @@ export default function ProfilePage() {
       setProfileData({
         name: response.data.name || '',
         phone: response.data.phone || '',
-        address: response.data.address || ''
+        address: response.data.address || '',
+        points: response.data.points || 0,
+        tier: response.data.tier || 'MEMBER',
+        avatarUrl: response.data.avatarUrl || '',
+        lastCheckIn: response.data.lastCheckIn || null
       });
+      if (response.data.pointHistories) {
+        setPointHistories(response.data.pointHistories);
+      }
     } catch (error) {
       console.error('Lỗi khi tải thông tin cá nhân', error);
     }
@@ -134,9 +154,91 @@ export default function ProfilePage() {
     }
   };
 
+  const handleReturnOrder = async (orderId: string) => {
+    const reason = prompt('Vui lòng nhập lý do muốn đổi/trả hàng:');
+    if (!reason) return;
+    try {
+      await apiClient.post(`/orders/${orderId}/return`, { reason });
+      toast.success('Đã gửi yêu cầu đổi/trả hàng. Chúng tôi sẽ liên hệ sớm.');
+      loadOrders();
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi gửi yêu cầu đổi/trả.');
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('Mật khẩu xác nhận không khớp');
+      return;
+    }
+    setIsChangingPassword(true);
+    try {
+      await apiClient.put('/users/profile/password', {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
+      toast.success('Đổi mật khẩu thành công');
+      setShowPasswordForm(false);
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi đổi mật khẩu');
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Trong thực tế sẽ gọi API upload file (S3, Cloudinary), ở đây ta giả lập dùng URL Object hoặc Base64
+    // Để đơn giản ta chỉ lấy URL random nếu ko có API thực, hoặc dùng base64
+    setIsUploadingAvatar(true);
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result as string;
+        await apiClient.put('/users/profile/avatar', { avatarUrl: base64String });
+        setProfileData({ ...profileData, avatarUrl: base64String });
+        updateUserAvatar(base64String);
+        toast.success('Cập nhật ảnh đại diện thành công');
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      toast.error('Lỗi khi cập nhật ảnh đại diện');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleCheckIn = async () => {
+    try {
+      await apiClient.post('/users/check-in');
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+      toast.success('Điểm danh thành công! +10 điểm');
+      loadProfile(); // Load lại profile để cập nhật điểm & lịch sử
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Không thể điểm danh lúc này.');
+    }
+  };
+
+  const hasCheckedInToday = () => {
+    if (!profileData.lastCheckIn) return false;
+    const lastCheckIn = new Date(profileData.lastCheckIn);
+    const today = new Date();
+    return lastCheckIn.getDate() === today.getDate() &&
+           lastCheckIn.getMonth() === today.getMonth() &&
+           lastCheckIn.getFullYear() === today.getFullYear();
   };
 
   const getStatusBadge = (status: string) => {
@@ -170,11 +272,33 @@ export default function ProfilePage() {
           <div className="w-full md:w-64 flex-shrink-0">
             <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
               <div className="p-6 text-center border-b border-slate-100">
-                <div className="w-20 h-20 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-3xl mx-auto mb-4">
-                  {user.name.charAt(0).toUpperCase()}
+                <div className="relative w-24 h-24 mx-auto mb-4 group cursor-pointer">
+                  {profileData.avatarUrl ? (
+                    <img src={profileData.avatarUrl} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-4xl shadow-inner">
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  
+                  <label className="absolute inset-0 flex items-center justify-center bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                    {isUploadingAvatar ? <Loader2 className="w-6 h-6 animate-spin" /> : <Camera className="w-6 h-6" />}
+                    <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={isUploadingAvatar} />
+                  </label>
                 </div>
                 <h3 className="font-bold text-slate-900">{user.name}</h3>
-                <p className="text-sm text-slate-500">{user.email}</p>
+                <p className="text-sm text-slate-500 mb-2">{user.email}</p>
+                <div className="inline-flex flex-col items-center gap-1">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                    profileData.tier === 'DIAMOND' ? 'bg-indigo-900 text-indigo-200' :
+                    profileData.tier === 'GOLD' ? 'bg-amber-100 text-amber-600' :
+                    profileData.tier === 'SILVER' ? 'bg-slate-200 text-slate-600' :
+                    'bg-emerald-100 text-emerald-600'
+                  }`}>
+                    {profileData.tier}
+                  </span>
+                  <span className="text-xs text-slate-500 font-medium">{profileData.points} điểm tích lũy</span>
+                </div>
               </div>
               <div className="p-2">
                 <button
@@ -190,6 +314,13 @@ export default function ProfilePage() {
                 >
                   <Package className="w-5 h-5" />
                   Lịch sử mua hàng
+                </button>
+                <button
+                  onClick={() => setActiveTab('rewards')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-colors mt-1 ${activeTab === 'rewards' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}
+                >
+                  <Gift className="w-5 h-5" />
+                  Tích điểm & Thưởng
                 </button>
                 <button
                   onClick={() => setActiveTab('addresses')}
@@ -256,8 +387,33 @@ export default function ProfilePage() {
                   </div>
                   <div className="mt-8 pt-6 border-t border-slate-100 flex gap-4">
                     <Button onClick={handleSaveProfile} isLoading={isSaving} className="h-12 px-8">Lưu thay đổi</Button>
-                    <Button variant="outline" className="h-12 border-2">Đổi mật khẩu</Button>
+                    <Button variant="outline" className="h-12 border-2" onClick={() => setShowPasswordForm(!showPasswordForm)}>
+                      {showPasswordForm ? 'Hủy đổi mật khẩu' : 'Đổi mật khẩu'}
+                    </Button>
                   </div>
+
+                  {showPasswordForm && (
+                    <form onSubmit={handleChangePassword} className="mt-6 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                      <h3 className="font-semibold text-slate-900 mb-4">Đổi mật khẩu</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Mật khẩu hiện tại</label>
+                          <input required type="password" value={passwordData.currentPassword} onChange={e => setPasswordData({...passwordData, currentPassword: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Mật khẩu mới</label>
+                          <input required type="password" value={passwordData.newPassword} onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Xác nhận mật khẩu mới</label>
+                          <input required type="password" value={passwordData.confirmPassword} onChange={e => setPasswordData({...passwordData, confirmPassword: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200" />
+                        </div>
+                      </div>
+                      <div className="mt-6 flex justify-end">
+                        <Button type="submit" isLoading={isChangingPassword}>Xác nhận đổi</Button>
+                      </div>
+                    </form>
+                  )}
                 </div>
               )}
 
@@ -303,6 +459,21 @@ export default function ProfilePage() {
                                 >
                                   Hủy đơn
                                 </button>
+                              )}
+                              {order.status === 'DELIVERED' && !order.returnStatus && (
+                                <button 
+                                  onClick={() => handleReturnOrder(order.id)}
+                                  className="text-xs font-semibold text-amber-600 hover:text-amber-700 hover:underline border border-amber-200 px-2 py-1 rounded-md"
+                                >
+                                  Đổi/Trả
+                                </button>
+                              )}
+                              {order.returnStatus && (
+                                <span className="text-xs font-semibold px-2 py-1 rounded-md bg-amber-50 text-amber-600 border border-amber-200">
+                                  {order.returnStatus === 'REQUESTED' ? 'Đang xử lý Đổi/Trả' : 
+                                   order.returnStatus === 'APPROVED' ? 'Đã duyệt Đổi/Trả' :
+                                   order.returnStatus === 'REJECTED' ? 'Từ chối Đổi/Trả' : 'Đã Trả hàng'}
+                                </span>
                               )}
                             </div>
                           </div>
@@ -383,6 +554,94 @@ export default function ProfilePage() {
                     {addresses.length === 0 && !showAddressForm && (
                       <div className="text-center py-10 text-slate-500">Bạn chưa có địa chỉ nào trong sổ.</div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'rewards' && (
+                <div className="animate-fade-in">
+                  <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                    <Gift className="w-6 h-6 text-indigo-600" />
+                    Tích điểm & Đổi thưởng
+                  </h2>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    {/* Hạng thành viên */}
+                    <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+                      <div className="relative z-10">
+                        <p className="text-indigo-100 text-sm font-medium mb-1">Hạng thành viên hiện tại</p>
+                        <h3 className="text-3xl font-extrabold mb-4">{profileData.tier}</h3>
+                        <div className="flex justify-between text-sm font-medium mb-2">
+                          <span>{profileData.points} điểm</span>
+                          <span className="text-indigo-200">
+                            {profileData.tier === 'MEMBER' ? '1000 điểm' : profileData.tier === 'SILVER' ? '5000 điểm' : profileData.tier === 'GOLD' ? '10000 điểm' : 'MAX'}
+                          </span>
+                        </div>
+                        {/* Progress Bar */}
+                        <div className="w-full bg-black/20 rounded-full h-2.5 backdrop-blur-sm overflow-hidden">
+                          <div 
+                            className="bg-white h-2.5 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.7)]" 
+                            style={{ width: `${Math.min(100, (profileData.points / (profileData.tier === 'MEMBER' ? 1000 : profileData.tier === 'SILVER' ? 5000 : profileData.tier === 'GOLD' ? 10000 : profileData.points)) * 100)}%` }}
+                          ></div>
+                        </div>
+                        <p className="text-xs text-indigo-100 mt-3">
+                          {profileData.tier !== 'DIAMOND' ? `Cố lên! Bạn sắp đạt Hạng tiếp theo rồi.` : `Chúc mừng! Bạn đang ở hạng cao nhất.`}
+                        </p>
+                      </div>
+                      <Star className="absolute -bottom-4 -right-4 w-32 h-32 text-white opacity-10" />
+                    </div>
+
+                    {/* Điểm danh */}
+                    <div className="bg-white rounded-3xl p-6 border-2 border-dashed border-indigo-200 flex flex-col items-center justify-center text-center hover:border-indigo-400 transition-colors">
+                      <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-4">
+                        <Gift className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-800 mb-2">Điểm danh nhận quà</h3>
+                      <p className="text-sm text-slate-500 mb-6">Mỗi ngày đăng nhập và điểm danh sẽ nhận được 10 điểm thưởng!</p>
+                      
+                      <Button 
+                        onClick={handleCheckIn} 
+                        disabled={hasCheckedInToday()}
+                        className={`w-full max-w-[200px] h-12 rounded-xl text-base font-bold transition-all ${
+                          hasCheckedInToday() 
+                            ? 'bg-slate-100 text-slate-400 border-none opacity-100' 
+                            : 'bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-lg shadow-orange-200'
+                        }`}
+                      >
+                        {hasCheckedInToday() ? 'Đã điểm danh' : 'Điểm danh ngay'}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Lịch sử điểm */}
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Lịch sử nhận điểm</h3>
+                    <div className="space-y-4">
+                      {pointHistories.length === 0 ? (
+                        <p className="text-slate-500 text-center py-8">Bạn chưa có lịch sử nhận điểm nào.</p>
+                      ) : (
+                        pointHistories.map(history => (
+                          <div key={history.id} className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div className="flex items-center gap-4">
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                history.points > 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'
+                              }`}>
+                                {history.points > 0 ? <Plus className="w-5 h-5" /> : <Minus className="w-5 h-5" />}
+                              </div>
+                              <div>
+                                <p className="font-bold text-slate-800">{history.reason}</p>
+                                <p className="text-xs text-slate-500">{new Date(history.createdAt).toLocaleString('vi-VN')}</p>
+                              </div>
+                            </div>
+                            <div className={`font-extrabold text-lg ${
+                              history.points > 0 ? 'text-emerald-600' : 'text-rose-600'
+                            }`}>
+                              {history.points > 0 ? '+' : ''}{history.points}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

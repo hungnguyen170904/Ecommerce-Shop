@@ -34,6 +34,10 @@ model User {
   phone     String?
   address   String?
   role      Role     @default(USER)
+  points    Int      @default(0)
+  tier      String   @default("MEMBER")
+  avatarUrl String?
+  lastCheckIn DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -47,6 +51,16 @@ model User {
 
   // Implicit many-to-many for Wishlist
   wishlistProducts Product[] @relation("UserWishlist")
+  pointHistories PointHistory[]
+}
+
+model PointHistory {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  points    Int      // Số điểm cộng/trừ
+  reason    String   // Lý do
+  createdAt DateTime @default(now())
 }
 
 model RefreshToken {
@@ -201,6 +215,8 @@ model Order {
   shippingAddress String?
   paymentMethod  String      @default("COD")
   notes          String?
+  returnStatus   String?     // REQUESTED, APPROVED, REJECTED, RETURNED
+  returnReason   String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 

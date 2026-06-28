@@ -20,6 +20,9 @@ export default function AdminSettingsPage() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  
+  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -75,6 +78,27 @@ export default function AdminSettingsPage() {
       alert('Có lỗi xảy ra khi lưu.');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      alert('Mật khẩu xác nhận không khớp');
+      return;
+    }
+    setIsChangingPassword(true);
+    try {
+      await apiClient.put('/users/profile/password', {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
+      alert('Đổi mật khẩu thành công!');
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Có lỗi xảy ra khi đổi mật khẩu');
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -204,6 +228,51 @@ export default function AdminSettingsPage() {
             </div>
           </form>
         )}
+      </div>
+
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden p-8 max-w-3xl mt-8 mb-12">
+        <h3 className="text-lg font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4 flex items-center gap-2">
+          <UserCircle className="w-5 h-5 text-indigo-600" /> Đổi mật khẩu Quản trị viên
+        </h3>
+        <form onSubmit={handleChangePassword} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Mật khẩu hiện tại</label>
+            <input 
+              required 
+              type="password" 
+              value={passwordData.currentPassword} 
+              onChange={e => setPasswordData({...passwordData, currentPassword: e.target.value})} 
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500" 
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Mật khẩu mới</label>
+              <input 
+                required 
+                type="password" 
+                value={passwordData.newPassword} 
+                onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})} 
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500" 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Xác nhận mật khẩu mới</label>
+              <input 
+                required 
+                type="password" 
+                value={passwordData.confirmPassword} 
+                onChange={e => setPasswordData({...passwordData, confirmPassword: e.target.value})} 
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500" 
+              />
+            </div>
+          </div>
+          <div className="pt-6 border-t border-slate-100 flex justify-end">
+            <Button type="submit" isLoading={isChangingPassword} className="gap-2 px-8 bg-slate-900 hover:bg-slate-800">
+              <Save className="w-4 h-4" /> Đổi mật khẩu
+            </Button>
+          </div>
+        </form>
       </div>
     </AdminLayout>
   );

@@ -21,6 +21,24 @@ export class UserController {
     return this.userService.updateProfile(req.user.userId, data);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Put('profile/password')
+  changePassword(@Request() req: any, @Body() data: any) {
+    return this.userService.changePassword(req.user.userId, data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('profile/avatar')
+  updateAvatar(@Request() req: any, @Body('avatarUrl') avatarUrl: string) {
+    return this.userService.updateAvatar(req.user.userId, avatarUrl);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('check-in')
+  checkIn(@Request() req: any) {
+    return this.userService.checkIn(req.user.userId);
+  }
+
   // --- ADDRESS BOOK APIs ---
   @UseGuards(JwtAuthGuard)
   @Get('addresses')
@@ -65,6 +83,17 @@ export class UserController {
   @Delete(':id')
   async deleteUser(@Param('id') id: string) {
     return this.userService.deleteUser(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Put('admin/:id/points')
+  async adjustUserPoints(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() body: { pointsChange: number; reason: string }
+  ) {
+    return this.userService.adjustUserPoints(id, req.user.userId, body.pointsChange, body.reason);
   }
 
   // --- WISHLIST APIs ---

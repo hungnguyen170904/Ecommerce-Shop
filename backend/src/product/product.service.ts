@@ -27,6 +27,9 @@ export class ProductService {
           orderBy: { sortOrder: 'asc' },
         },
         brand: true,
+        categories: {
+          include: { category: true }
+        },
         variants: {
           where: { isActive: true },
         },

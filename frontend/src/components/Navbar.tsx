@@ -1,14 +1,16 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Search, Menu, Bell, HelpCircle, Globe, ChevronDown, Heart, Store } from 'lucide-react';
+import { ShoppingCart, Search, Menu, Bell, HelpCircle, Globe, ChevronDown, Heart, Store, ArrowRightLeft } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
 import { useSettingsStore } from '../store/useSettingsStore';
+import { useCompareStore } from '../store/useCompareStore';
 import { useEffect, useState } from 'react';
 
 export function Navbar() {
   const user = useAuthStore((state) => state.user);
   const { itemCount, fetchCart } = useCartStore();
   const settings = useSettingsStore((state) => state.settings);
+  const compareItems = useCompareStore((state) => state.items);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -109,7 +111,16 @@ export function Navbar() {
               </Link>
             )}
 
-            <Link to="/cart" className="relative p-2 text-white hover:text-indigo-200 transition-colors mt-2">
+            <Link to="/compare" className="relative p-2 text-white hover:text-blue-200 transition-colors mt-2" title="So sánh sản phẩm">
+              <ArrowRightLeft className="w-7 h-7" />
+              {compareItems.length > 0 && (
+                <span className="absolute top-0 right-0 w-5 h-5 bg-blue-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border-2 border-indigo-600 shadow-sm">
+                  {compareItems.length}
+                </span>
+              )}
+            </Link>
+
+            <Link to="/cart" className="relative p-2 text-white hover:text-indigo-200 transition-colors mt-2" title="Giỏ hàng">
               <ShoppingCart className="w-7 h-7" />
               {itemCount > 0 && (
                 <span className="absolute top-0 right-0 w-5 h-5 bg-rose-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border-2 border-indigo-600 shadow-sm">
@@ -121,9 +132,13 @@ export function Navbar() {
             {user ? (
               <div className="relative group mt-2 flex items-center">
                 <Link to={user.role === 'ADMIN' ? '/admin' : '/profile'} className="flex items-center gap-2 cursor-pointer">
-                  <div className="w-9 h-9 rounded-full bg-white/20 text-white flex items-center justify-center font-bold border border-white/30 group-hover:bg-white group-hover:text-indigo-600 transition-colors">
-                    {user.name.charAt(0).toUpperCase()}
-                  </div>
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="Avatar" className="w-9 h-9 rounded-full object-cover border border-white/30" />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-white/20 text-white flex items-center justify-center font-bold border border-white/30 group-hover:bg-white group-hover:text-indigo-600 transition-colors">
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <div className="hidden lg:block text-white">
                     <p className="text-sm font-medium leading-none">{user.name}</p>
                   </div>

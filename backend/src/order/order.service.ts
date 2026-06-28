@@ -142,9 +142,59 @@ export class OrderService {
   }
 
   async updateOrderStatus(orderId: string, status: any) {
-    return this.prisma.order.update({
+    const order = await this.prisma.order.update({
       where: { id: orderId },
       data: { status }
+    });
+
+    // Tính năng Tích điểm (Loyalty)
+    if (status === 'DELIVERED') {
+      const user = await this.prisma.user.findUnique({ where: { id: order.userId } });
+      if (user) {
+        const pointsEarned = Math.floor(order.totalAmount / 10000);
+        const newPoints = user.points + pointsEarned;
+        
+        let newTier = 'MEMBER';
+        if (newPoints >= 10000) newTier = 'DIAMOND';
+        else if (newPoints >= 5000) newTier = 'GOLD';
+        else if (newPoints >= 1000) newTier = 'SILVER';
+
+        await this.prisma.$transaction([
+          this.prisma.user.update({
+            where: { id: user.id },
+            data: { points: newPoints, tier: newTier }
+          }),
+          this.prisma.pointHistory.create({
+            data: {
+              userId: user.id,
+              points: pointsEarned,
+              reason: `Mua đơn hàng #${order.id.split('-')[0].toUpperCase()}`
+            }
+          })
+        ]);
+      }
+    }
+    return order;
+  }
+
+  // --- Tính năng Đổi/Trả hàng ---
+  async requestReturn(userId: string, orderId: string, reason: string) {
+    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    if (!order) throw new BadRequestException('Không tìm thấy đơn hàng');
+    if (order.userId !== userId) throw new BadRequestException('Không có quyền thao tác đơn hàng này');
+    if (order.status !== 'DELIVERED') throw new BadRequestException('Chỉ có thể đổi trả đơn hàng đã giao thành công');
+
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: { returnStatus: 'REQUESTED', returnReason: reason }
+    });
+  }
+
+  async processReturn(orderId: string, returnStatus: string) {
+    // returnStatus: APPROVED, REJECTED, RETURNED
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: { returnStatus }
     });
   }
 

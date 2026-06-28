@@ -64,7 +64,7 @@ export default function HomePage() {
           <h2 className="text-base font-bold text-slate-800 uppercase mb-6">Danh mục sản phẩm</h2>
           <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
             {categories.map((cat: any) => (
-              <Link key={cat.id} to={`/category/${cat.slug}`} className="flex flex-col items-center gap-3 group">
+              <Link key={cat.id} to={`/search?category=${cat.id}`} className="flex flex-col items-center gap-3 group">
                 <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm border border-indigo-100 group-hover:shadow-md">
                   <span className="font-bold text-xl">{cat.name.charAt(0)}</span>
                 </div>
@@ -80,7 +80,7 @@ export default function HomePage() {
             <h2 className="text-xl font-bold text-rose-600 flex items-center gap-2 italic">
               <Zap className="fill-rose-600" /> FLASH SALE
             </h2>
-            <Link to="#" className="text-sm font-medium text-slate-500 hover:text-indigo-600 flex items-center">
+            <Link to="/search" className="text-sm font-medium text-slate-500 hover:text-indigo-600 flex items-center">
               Xem tất cả <ChevronRight className="w-4 h-4 ml-1" />
             </Link>
           </div>
@@ -116,9 +116,11 @@ export default function HomePage() {
                 ))}
               </div>
               <div className="mt-10 flex justify-center">
-                <button className="bg-white border border-slate-300 text-slate-600 px-24 py-3.5 rounded-lg font-medium hover:bg-slate-50 transition-colors shadow-sm">
-                  Xem thêm
-                </button>
+                <Link to="/search">
+                  <button className="bg-white border border-slate-300 text-slate-600 px-24 py-3.5 rounded-lg font-medium hover:bg-slate-50 transition-colors shadow-sm">
+                    Xem tất cả sản phẩm
+                  </button>
+                </Link>
               </div>
             </>
           )}

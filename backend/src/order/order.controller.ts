@@ -26,6 +26,11 @@ export class OrderController {
     return this.orderService.cancelOrder(req.user.userId, id);
   }
 
+  @Post(':id/return')
+  async requestReturn(@Request() req: any, @Param('id') id: string, @Body('reason') reason: string) {
+    return this.orderService.requestReturn(req.user.userId, id, reason);
+  }
+
   // --- ADMIN APIs ---
   
   @UseGuards(RolesGuard)
@@ -47,5 +52,12 @@ export class OrderController {
   @Put('admin/:id/status')
   updateOrderStatus(@Param('id') id: string, @Body('status') status: any) {
     return this.orderService.updateOrderStatus(id, status);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @Put('admin/:id/return')
+  processReturn(@Param('id') id: string, @Body('returnStatus') returnStatus: string) {
+    return this.orderService.processReturn(id, returnStatus);
   }
 }

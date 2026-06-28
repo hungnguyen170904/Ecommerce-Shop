@@ -41,6 +41,21 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const handleReturnAction = async (orderId: string, returnStatus: string) => {
+    if (!confirm(`Bạn có muốn ${returnStatus === 'APPROVED' ? 'Chấp nhận' : 'Từ chối'} yêu cầu đổi trả này?`)) return;
+    
+    setUpdatingId(orderId);
+    try {
+      await apiClient.put(`/orders/admin/${orderId}/return`, { returnStatus });
+      setOrders(orders.map(o => o.id === orderId ? { ...o, returnStatus } : o));
+    } catch (error) {
+      console.error('Lỗi xử lý đổi trả', error);
+      alert('Không thể xử lý đổi trả.');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PENDING': return 'bg-amber-100 text-amber-800';
@@ -124,9 +139,21 @@ export default function AdminOrdersPage() {
                       {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalAmount)}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(order.status)}`}>
-                        {order.status}
-                      </span>
+                      <div className="flex flex-col gap-2 items-start">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(order.status)}`}>
+                          {order.status}
+                        </span>
+                        {order.returnStatus === 'REQUESTED' && (
+                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                            Yêu cầu Đổi/Trả
+                          </span>
+                        )}
+                        {order.returnStatus === 'APPROVED' && (
+                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+                            Đã duyệt Đổi/Trả
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 flex items-center gap-2">
                       <button 
@@ -181,6 +208,31 @@ export default function AdminOrdersPage() {
                   <p className="text-xs text-slate-600 line-clamp-3">{selectedOrder.shippingAddress || 'Không có địa chỉ'}</p>
                   <p className="text-sm font-bold text-slate-700 mt-2 mb-1">Phương thức thanh toán:</p>
                   <p className="text-xs font-semibold text-indigo-600">{selectedOrder.paymentMethod === 'ONLINE' ? 'Chuyển khoản (VietQR)' : 'Thanh toán khi nhận hàng (COD)'}</p>
+                  
+                  {selectedOrder.returnStatus && (
+                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <h4 className="text-sm font-bold text-amber-800 mb-1">Yêu cầu Đổi/Trả hàng</h4>
+                      <p className="text-xs text-amber-900 mb-2"><span className="font-semibold">Lý do:</span> {selectedOrder.returnReason}</p>
+                      <p className="text-xs text-amber-700 mb-3"><span className="font-semibold">Trạng thái:</span> {selectedOrder.returnStatus}</p>
+                      
+                      {selectedOrder.returnStatus === 'REQUESTED' && (
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => { handleReturnAction(selectedOrder.id, 'APPROVED'); setSelectedOrder({...selectedOrder, returnStatus: 'APPROVED'}); }}
+                            className="flex-1 px-2 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-md"
+                          >
+                            Duyệt
+                          </button>
+                          <button 
+                            onClick={() => { handleReturnAction(selectedOrder.id, 'REJECTED'); setSelectedOrder({...selectedOrder, returnStatus: 'REJECTED'}); }}
+                            className="flex-1 px-2 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium rounded-md"
+                          >
+                            Từ chối
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 

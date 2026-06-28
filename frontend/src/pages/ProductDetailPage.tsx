@@ -6,7 +6,8 @@ import { Button } from '../components/Button';
 import { apiClient } from '../api/axios';
 import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
-import { Loader2, ArrowLeft, ShoppingCart, ShieldCheck, Truck, CheckCircle2, Minus, Plus, Heart, Star } from 'lucide-react';
+import { useCompareStore } from '../store/useCompareStore';
+import { Loader2, ArrowLeft, ShoppingCart, ShieldCheck, Truck, CheckCircle2, Minus, Plus, Heart, Star, ArrowRightLeft } from 'lucide-react';
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -18,6 +19,9 @@ export default function ProductDetailPage() {
   const [addedSuccess, setAddedSuccess] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const addToCompare = useCompareStore((state) => state.addToCompare);
+  const compareItems = useCompareStore((state) => state.items);
+  const isCompared = product ? compareItems.some(item => item.id === product.id) : false;
   
   // Reviews state
   const [reviews, setReviews] = useState<any[]>([]);
@@ -267,6 +271,17 @@ export default function ProductDetailPage() {
                     title={isWishlisted ? "Bỏ yêu thích" : "Yêu thích"}
                   >
                     <Heart className={`w-6 h-6 ${isWishlisted ? 'fill-rose-500 text-rose-500' : ''}`} />
+                  </button>
+                  <button
+                    onClick={() => addToCompare(product)}
+                    className={`w-14 h-14 rounded-2xl border-2 flex items-center justify-center transition-colors ${
+                      isCompared 
+                        ? 'bg-blue-50 text-blue-600 border-blue-200' 
+                        : 'bg-white border-slate-200 text-slate-400 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600'
+                    }`}
+                    title="So sánh sản phẩm"
+                  >
+                    <ArrowRightLeft className="w-6 h-6" />
                   </button>
                 </div>
                 {addedSuccess && (

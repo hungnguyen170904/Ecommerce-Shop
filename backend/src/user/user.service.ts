@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -16,8 +17,16 @@ export class UserService {
         address: true,
         role: true,
         createdAt: true,
+        points: true,
+        tier: true,
+        avatarUrl: true,
+        lastCheckIn: true,
         addresses: {
           orderBy: { isDefault: 'desc' }
+        },
+        pointHistories: {
+          orderBy: { createdAt: 'desc' },
+          take: 10
         }
       }
     });
@@ -42,6 +51,23 @@ export class UserService {
         role: true,
       }
     });
+  }
+
+  async changePassword(userId: string, data: any) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('Không tìm thấy người dùng');
+
+    const isMatch = await bcrypt.compare(data.currentPassword, user.password);
+    if (!isMatch) {
+      throw new BadRequestException('Mật khẩu hiện tại không đúng');
+    }
+
+    const hashedPassword = await bcrypt.hash(data.newPassword, 10);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword }
+    });
+    return { success: true };
   }
 
   // --- WISHLIST ---
@@ -105,9 +131,38 @@ export class UserService {
         address: true,
         role: true,
         createdAt: true,
+        points: true,
+        tier: true,
+        avatarUrl: true,
       },
       orderBy: { createdAt: 'desc' }
     });
+  }
+
+  async adjustUserPoints(userId: string, adminId: string, pointsChange: number, reason: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('Không tìm thấy người dùng');
+
+    const newPoints = Math.max(0, user.points + pointsChange);
+    
+    let newTier = 'MEMBER';
+    if (newPoints >= 10000) newTier = 'DIAMOND';
+    else if (newPoints >= 5000) newTier = 'GOLD';
+    else if (newPoints >= 1000) newTier = 'SILVER';
+
+    return this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: userId },
+        data: { points: newPoints, tier: newTier }
+      }),
+      this.prisma.pointHistory.create({
+        data: {
+          userId,
+          points: pointsChange,
+          reason: `[Admin điều chỉnh] ${reason}`
+        }
+      })
+    ]);
   }
 
   async deleteUser(id: string) {
@@ -200,5 +255,54 @@ export class UserService {
       where: { id: addressId },
       data: { isDefault: true }
     });
+  }
+
+  // --- GAMIFICATION & AVATAR APIs ---
+  async updateAvatar(userId: string, avatarUrl: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { avatarUrl },
+      select: { avatarUrl: true }
+    });
+  }
+
+  async checkIn(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('Người dùng không tồn tại');
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Kiểm tra xem đã điểm danh hôm nay chưa
+    if (user.lastCheckIn && user.lastCheckIn >= today) {
+      throw new Error('Bạn đã điểm danh hôm nay rồi!');
+    }
+
+    const checkInPoints = 10; // Cố định 10 điểm mỗi ngày
+    const newPoints = user.points + checkInPoints;
+
+    let newTier = 'MEMBER';
+    if (newPoints >= 10000) newTier = 'DIAMOND';
+    else if (newPoints >= 5000) newTier = 'GOLD';
+    else if (newPoints >= 1000) newTier = 'SILVER';
+
+    // Cập nhật User và lưu Lịch sử điểm
+    return this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          points: newPoints,
+          tier: newTier,
+          lastCheckIn: new Date()
+        }
+      }),
+      this.prisma.pointHistory.create({
+        data: {
+          userId,
+          points: checkInPoints,
+          reason: 'Điểm danh hàng ngày'
+        }
+      })
+    ]);
   }
 }

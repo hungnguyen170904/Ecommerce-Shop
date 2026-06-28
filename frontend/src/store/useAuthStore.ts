@@ -6,6 +6,7 @@ interface User {
   email: string;
   name: string;
   role: string;
+  avatarUrl?: string;
 }
 
 interface AuthState {
@@ -13,6 +14,7 @@ interface AuthState {
   user: User | null;
   setAuth: (token: string, user: User) => void;
   logout: () => void;
+  updateUserAvatar: (avatarUrl: string) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -22,6 +24,9 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       setAuth: (token, user) => set({ token, user }),
       logout: () => set({ token: null, user: null }),
+      updateUserAvatar: (avatarUrl) => set((state) => ({
+        user: state.user ? { ...state.user, avatarUrl } : null
+      })),
     }),
     {
       name: 'auth-storage', // Lưu xuống LocalStorage để f5 không bị mất đăng nhập

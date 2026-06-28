@@ -19,6 +19,7 @@ import AdminCategoriesPage from './pages/AdminCategoriesPage';
 import AdminBrandsPage from './pages/AdminBrandsPage';
 import AdminInventoryPage from './pages/AdminInventoryPage';
 import WishlistPage from './pages/WishlistPage';
+import ComparePage from './pages/ComparePage';
 import { useAuthStore } from './store/useAuthStore';
 import { useSettingsStore } from './store/useSettingsStore';
 
@@ -67,6 +68,7 @@ function App() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/product/:slug" element={<ProductDetailPage />} />
         <Route path="/category/:slug" element={<CategoryPage />} />
+        <Route path="/compare" element={<ComparePage />} />
         
         {/* Các trang yêu cầu Đăng nhập */}
         <Route 
