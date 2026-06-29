@@ -65,7 +65,7 @@ export function Navbar() {
                 <img 
                   src={settings.logoUrl.startsWith('/') ? `http://localhost:3000${settings.logoUrl}` : settings.logoUrl} 
                   alt="Logo" 
-                  className="w-full h-full object-contain mix-blend-multiply"
+                  className="w-full h-full object-contain"
                 />
               </div>
             ) : (

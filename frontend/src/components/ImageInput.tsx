@@ -15,9 +15,11 @@ export function ImageInput({ label = "Hình ảnh", initialUrl = "", onImageChan
   const [preview, setPreview] = useState<string>('');
 
   useEffect(() => {
-    setImageUrl(initialUrl);
-    setPreview(initialUrl.startsWith('/') ? `http://localhost:3000${initialUrl}` : initialUrl);
-  }, [initialUrl]);
+    if (!imageFile) {
+      setImageUrl(initialUrl);
+      setPreview(initialUrl ? (initialUrl.startsWith('/') ? `http://localhost:3000${initialUrl}` : initialUrl) : '');
+    }
+  }, [initialUrl, imageFile]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

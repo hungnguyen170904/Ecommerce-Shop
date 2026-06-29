@@ -2,3 +2,5 @@ node_modules
 dist
 .env
 .DS_Store
+danh_sach_san_pham_cong_nghe.json
+danh_sach_san_pham_cong_nghe.xlsx

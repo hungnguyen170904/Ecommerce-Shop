@@ -18,7 +18,7 @@ export function Footer() {
                   <img 
                     src={settings.logoUrl.startsWith('/') ? `http://localhost:3000${settings.logoUrl}` : settings.logoUrl} 
                     alt="Logo" 
-                    className="w-full h-full object-contain filter brightness-0 invert"
+                    className="w-full h-full object-contain"
                   />
                 </div>
               ) : (

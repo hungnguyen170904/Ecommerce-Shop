@@ -13,7 +13,7 @@ async function bootstrap() {
   app.enableCors();
 
   // Cấu hình phục vụ file tĩnh cho thư mục uploads
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
     prefix: '/uploads/',
   });
 
