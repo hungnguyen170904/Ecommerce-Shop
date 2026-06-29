@@ -25,7 +25,7 @@ export function ProductCard({ product }: { product: Product }) {
   const isCompared = compareItems.some(item => item.id === product.id);
 
   return (
-    <div className="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col relative">
+    <div className="group bg-white rounded-[24px] overflow-hidden shadow-sm hover:shadow-hover hover:-translate-y-2 transition-all duration-500 flex flex-col relative">
       <Link 
         to={`/product/${product.slug}`} 
         className="flex flex-col flex-grow"
@@ -44,11 +44,11 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
       
       <div className="p-4 flex flex-col flex-grow">
-        <h3 className="font-semibold text-slate-800 line-clamp-2 mb-1 group-hover:text-indigo-600 transition-colors">
+        <h3 className="font-bold text-slate-800 line-clamp-2 mb-1 group-hover:text-brand-cta transition-colors text-lg">
           {product.name}
         </h3>
         <div className="mt-auto pt-3 flex items-center justify-between">
-          <span className="font-bold text-lg text-indigo-600">
+          <span className="font-extrabold text-xl text-brand-cta">
             {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)}
           </span>
         </div>
@@ -63,7 +63,7 @@ export function ProductCard({ product }: { product: Product }) {
             e.stopPropagation();
             addToCompare(product);
           }}
-          className={`w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md transition-colors ${isCompared ? 'text-blue-600 border border-blue-200' : 'text-slate-400 hover:text-blue-600 hover:bg-blue-50'}`}
+          className={`w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-soft transition-all duration-300 ${isCompared ? 'text-brand-cta border border-brand-cta/20' : 'text-slate-400 hover:text-white hover:bg-brand-cta hover:scale-110'}`}
           title="So sánh"
         >
           <ArrowRightLeft className="w-4 h-4" />

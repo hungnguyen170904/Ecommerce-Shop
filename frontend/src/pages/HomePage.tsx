@@ -34,63 +34,77 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-brand-bg flex flex-col font-sans">
       <Navbar />
       
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
         
-        {/* Banner Section */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="rounded-3xl overflow-hidden aspect-[21/9] md:aspect-[16/9] relative group">
-            <img src={settings?.bannerUrl1 || "https://images.unsplash.com/photo-1605236453806-6ff36851218e?q=80&w=800"} alt="Promo 1" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-            <div className="absolute bottom-6 left-6 text-white">
-              <p className="text-sm font-medium mb-1">Mới ra mắt</p>
-              <h3 className="text-2xl font-bold">iPhone 15 Pro</h3>
+        {/* Bento Grid Hero Section */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up">
+          <div className="md:col-span-2 rounded-[32px] overflow-hidden aspect-[21/9] md:aspect-auto md:h-[420px] relative group shadow-soft hover:shadow-hover transition-all duration-500">
+            <img src={settings?.bannerUrl1 || "https://images.unsplash.com/photo-1605236453806-6ff36851218e?q=80&w=1200"} alt="Promo 1" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+            <div className="absolute bottom-10 left-10 text-white max-w-md">
+              <span className="px-4 py-1.5 rounded-full bg-brand-cta/20 backdrop-blur-md text-blue-300 border border-brand-cta/30 text-xs font-bold tracking-wider uppercase mb-4 inline-block">Mới ra mắt</span>
+              <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight">iPhone 15 Pro Max</h3>
+              <p className="text-slate-300 mb-8 line-clamp-2 text-base">Trải nghiệm sức mạnh vượt trội từ vi xử lý A17 Pro cùng thiết kế Titanium hoàn toàn mới.</p>
+              <Link to="/search" className="inline-flex items-center gap-2 bg-white text-brand-dark px-7 py-3.5 rounded-2xl font-bold hover:bg-brand-cta hover:text-white transition-all duration-300 shadow-lg hover:shadow-brand-cta/30">
+                Mua ngay <ChevronRight className="w-5 h-5" />
+              </Link>
             </div>
           </div>
-          <div className="rounded-3xl overflow-hidden aspect-[21/9] md:aspect-[16/9] relative group">
+          
+          <div className="rounded-[32px] overflow-hidden aspect-[4/3] md:aspect-auto md:h-[420px] relative group shadow-soft hover:shadow-hover transition-all duration-500">
             <img src={settings?.bannerUrl2 || "https://images.unsplash.com/photo-1542393545-10f5cde2c810?q=80&w=800"} alt="Promo 2" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-            <div className="absolute bottom-6 left-6 text-white">
-              <p className="text-sm font-medium mb-1">Giảm đến 30%</p>
-              <h3 className="text-2xl font-bold">Macbook Air M2</h3>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+            <div className="absolute bottom-8 left-8 text-white">
+              <span className="px-3 py-1 rounded-full bg-rose-500/20 backdrop-blur-md text-rose-300 border border-rose-500/30 text-[10px] font-bold uppercase mb-3 inline-block">Flash Sale</span>
+              <h3 className="text-3xl font-extrabold tracking-tight mb-2">Macbook Air M2</h3>
+              <p className="text-slate-300 mb-5">Giảm đến 30% cho sinh viên</p>
+              <Link to="/search" className="inline-flex items-center gap-1 text-sm font-bold text-white hover:text-rose-300 transition-colors">
+                Khám phá <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
         </section>
 
         {/* Categories Menu */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h2 className="text-base font-bold text-slate-800 uppercase mb-6">Danh mục sản phẩm</h2>
-          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+        <section className="bg-white rounded-[32px] shadow-soft p-8">
+          <div className="flex justify-between items-end mb-8">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-brand-dark tracking-tight">Danh mục Nổi bật</h2>
+          </div>
+          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-6">
             {categories.map((cat: any) => (
-              <Link key={cat.id} to={`/search?category=${cat.id}`} className="flex flex-col items-center gap-3 group">
-                <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm border border-indigo-100 group-hover:shadow-md">
-                  <span className="font-bold text-xl">{cat.name.charAt(0)}</span>
+              <Link key={cat.id} to={`/search?category=${cat.id}`} className="flex flex-col items-center gap-4 group">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-[20px] bg-brand-bg flex items-center justify-center text-slate-400 group-hover:bg-brand-cta group-hover:text-white transition-all duration-500 group-hover:shadow-hover group-hover:-translate-y-2">
+                  <span className="font-extrabold text-2xl md:text-3xl">{cat.name.charAt(0)}</span>
                 </div>
-                <span className="text-xs text-center text-slate-600 font-medium group-hover:text-indigo-600 line-clamp-2">{cat.name}</span>
+                <span className="text-sm text-center text-brand-muted font-semibold group-hover:text-brand-dark transition-colors line-clamp-2">{cat.name}</span>
               </Link>
             ))}
           </div>
         </section>
 
         {/* Flash Sale Mock */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 overflow-hidden">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-rose-600 flex items-center gap-2 italic">
-              <Zap className="fill-rose-600" /> FLASH SALE
-            </h2>
-            <Link to="/search" className="text-sm font-medium text-slate-500 hover:text-indigo-600 flex items-center">
-              Xem tất cả <ChevronRight className="w-4 h-4 ml-1" />
+        <section className="bg-white rounded-[32px] shadow-soft p-8 overflow-hidden">
+          <div className="flex justify-between items-end mb-8">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-rose-600 tracking-tight flex items-center gap-2">
+                <Zap className="fill-rose-600 w-8 h-8" /> Flash Sale
+              </h2>
+              <p className="text-brand-muted mt-2 font-medium">Kết thúc trong 02:45:30</p>
+            </div>
+            <Link to="/search" className="text-sm font-bold text-brand-muted hover:text-brand-cta flex items-center transition-colors">
+              Xem tất cả <ChevronRight className="w-5 h-5 ml-1" />
             </Link>
           </div>
           
           {isLoading ? (
             <div className="flex justify-center items-center h-48">
-              <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-brand-cta" />
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {products.slice(0, 5).map((product: any) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -99,26 +113,26 @@ export default function HomePage() {
         </section>
 
         {/* Daily Discover */}
-        <section className="mb-12">
-          <div className="bg-white border-b-2 border-indigo-600 sticky top-20 z-40 p-4 mb-6 shadow-sm">
-            <h2 className="text-lg font-bold text-indigo-600 text-center uppercase tracking-widest">Gợi Ý Hôm Nay</h2>
+        <section className="mb-16">
+          <div className="flex justify-between items-end mb-8">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-brand-dark tracking-tight">Dành riêng cho bạn</h2>
           </div>
 
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
-              <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-brand-cta" />
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                 {products.map((product: any) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
-              <div className="mt-10 flex justify-center">
+              <div className="mt-12 flex justify-center">
                 <Link to="/search">
-                  <button className="bg-white border border-slate-300 text-slate-600 px-24 py-3.5 rounded-lg font-medium hover:bg-slate-50 transition-colors shadow-sm">
-                    Xem tất cả sản phẩm
+                  <button className="bg-white border-2 border-slate-200 text-brand-dark px-10 py-4 rounded-2xl font-bold hover:border-brand-cta hover:text-brand-cta hover:shadow-hover hover:-translate-y-1 transition-all duration-300">
+                    Xem thêm sản phẩm
                   </button>
                 </Link>
               </div>

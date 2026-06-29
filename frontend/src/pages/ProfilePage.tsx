@@ -114,6 +114,9 @@ export default function ProfilePage() {
       if (response.data.pointHistories) {
         setPointHistories(response.data.pointHistories);
       }
+      if (response.data.avatarUrl && response.data.avatarUrl !== user?.avatarUrl) {
+        updateUserAvatar(response.data.avatarUrl);
+      }
     } catch (error) {
       console.error('Lỗi khi tải thông tin cá nhân', error);
     }
