@@ -33,6 +33,9 @@ export default function HomePage() {
     fetchData();
   }, []);
 
+  const heroProduct1 = products.length > 0 ? products[0] : null;
+  const heroProduct2 = products.length > 1 ? products[1] : null;
+
   return (
     <div className="min-h-screen bg-brand-bg flex flex-col font-sans">
       <Navbar />
@@ -42,26 +45,26 @@ export default function HomePage() {
         {/* Bento Grid Hero Section */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up">
           <div className="md:col-span-2 rounded-[32px] overflow-hidden aspect-[21/9] md:aspect-auto md:h-[420px] relative group shadow-soft hover:shadow-hover transition-all duration-500">
-            <img src={settings?.bannerUrl1 || "https://images.unsplash.com/photo-1605236453806-6ff36851218e?q=80&w=1200"} alt="Promo 1" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src={settings?.bannerUrl1 || heroProduct1?.images?.[0]?.url || "https://images.unsplash.com/photo-1605236453806-6ff36851218e?q=80&w=1200"} alt="Promo 1" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
             <div className="absolute bottom-10 left-10 text-white max-w-md">
               <span className="px-4 py-1.5 rounded-full bg-brand-cta/20 backdrop-blur-md text-blue-300 border border-brand-cta/30 text-xs font-bold tracking-wider uppercase mb-4 inline-block">Mới ra mắt</span>
-              <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight">iPhone 15 Pro Max</h3>
-              <p className="text-slate-300 mb-8 line-clamp-2 text-base">Trải nghiệm sức mạnh vượt trội từ vi xử lý A17 Pro cùng thiết kế Titanium hoàn toàn mới.</p>
-              <Link to="/search" className="inline-flex items-center gap-2 bg-white text-brand-dark px-7 py-3.5 rounded-2xl font-bold hover:bg-brand-cta hover:text-white transition-all duration-300 shadow-lg hover:shadow-brand-cta/30">
+              <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight">{heroProduct1?.name || "Khám phá Sản phẩm mới"}</h3>
+              <p className="text-slate-300 mb-8 line-clamp-2 text-base">{heroProduct1?.description || "Trải nghiệm những thiết bị công nghệ hàng đầu."}</p>
+              <Link to={heroProduct1 ? `/product/${heroProduct1.slug}` : "/search"} className="inline-flex items-center gap-2 bg-white text-brand-dark px-7 py-3.5 rounded-2xl font-bold hover:bg-brand-cta hover:text-white transition-all duration-300 shadow-lg hover:shadow-brand-cta/30">
                 Mua ngay <ChevronRight className="w-5 h-5" />
               </Link>
             </div>
           </div>
           
           <div className="rounded-[32px] overflow-hidden aspect-[4/3] md:aspect-auto md:h-[420px] relative group shadow-soft hover:shadow-hover transition-all duration-500">
-            <img src={settings?.bannerUrl2 || "https://images.unsplash.com/photo-1542393545-10f5cde2c810?q=80&w=800"} alt="Promo 2" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src={settings?.bannerUrl2 || heroProduct2?.images?.[0]?.url || "https://images.unsplash.com/photo-1542393545-10f5cde2c810?q=80&w=800"} alt="Promo 2" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
             <div className="absolute bottom-8 left-8 text-white">
-              <span className="px-3 py-1 rounded-full bg-rose-500/20 backdrop-blur-md text-rose-300 border border-rose-500/30 text-[10px] font-bold uppercase mb-3 inline-block">Flash Sale</span>
-              <h3 className="text-3xl font-extrabold tracking-tight mb-2">Macbook Air M2</h3>
-              <p className="text-slate-300 mb-5">Giảm đến 30% cho sinh viên</p>
-              <Link to="/search" className="inline-flex items-center gap-1 text-sm font-bold text-white hover:text-rose-300 transition-colors">
+              <span className="px-3 py-1 rounded-full bg-rose-500/20 backdrop-blur-md text-rose-300 border border-rose-500/30 text-[10px] font-bold uppercase mb-3 inline-block">Đang Hot</span>
+              <h3 className="text-3xl font-extrabold tracking-tight mb-2 line-clamp-1">{heroProduct2?.name || "Ưu đãi hấp dẫn"}</h3>
+              <p className="text-slate-300 mb-5">{heroProduct2?.basePrice ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(heroProduct2.basePrice) : "Giảm đến 30%"}</p>
+              <Link to={heroProduct2 ? `/product/${heroProduct2.slug}` : "/search"} className="inline-flex items-center gap-1 text-sm font-bold text-white hover:text-rose-300 transition-colors">
                 Khám phá <ChevronRight className="w-4 h-4" />
               </Link>
             </div>

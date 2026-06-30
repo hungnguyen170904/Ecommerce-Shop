@@ -32,12 +32,12 @@ export function Footer() {
             </Link>
             <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Chăm sóc khách hàng</h3>
             <ul className="space-y-3 text-sm text-slate-600">
-              <li><Link to="#" className="hover:text-indigo-600">Trung Tâm Trợ Giúp</Link></li>
-              <li><Link to="#" className="hover:text-indigo-600">Hướng Dẫn Mua Hàng</Link></li>
-              <li><Link to="#" className="hover:text-indigo-600">Hướng Dẫn Bán Hàng</Link></li>
-              <li><Link to="#" className="hover:text-indigo-600">Thanh Toán</Link></li>
-              <li><Link to="#" className="hover:text-indigo-600">Vận Chuyển</Link></li>
-              <li><Link to="#" className="hover:text-indigo-600">Trả Hàng & Hoàn Tiền</Link></li>
+              <li><Link to="/help" className="hover:text-indigo-600">Trung Tâm Trợ Giúp</Link></li>
+              <li><Link to="/shopping-guide" className="hover:text-indigo-600">Hướng Dẫn Mua Hàng</Link></li>
+              <li><Link to="/selling-guide" className="hover:text-indigo-600">Hướng Dẫn Bán Hàng</Link></li>
+              <li><Link to="/payment-guide" className="hover:text-indigo-600">Thanh Toán</Link></li>
+              <li><Link to="/shipping" className="hover:text-indigo-600">Vận Chuyển</Link></li>
+              <li><Link to="/returns" className="hover:text-indigo-600">Trả Hàng & Hoàn Tiền</Link></li>
             </ul>
           </div>
 
@@ -45,12 +45,12 @@ export function Footer() {
           <div>
             <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Về {settings?.siteName || 'E-Commerce'}</h3>
             <ul className="space-y-3 text-sm text-slate-600">
-              <li><Link to="#" className="hover:text-indigo-600">Giới Thiệu Về {settings?.siteName || 'E-Commerce'}</Link></li>
-              <li><Link to="#" className="hover:text-indigo-600">Tuyển Dụng</Link></li>
-              <li><Link to="#" className="hover:text-indigo-600">Điều Khoản</Link></li>
-              <li><Link to="#" className="hover:text-indigo-600">Chính Sách Bảo Mật</Link></li>
-              <li><Link to="#" className="hover:text-indigo-600">Chính Hãng</Link></li>
-              <li><Link to="#" className="hover:text-indigo-600">Kênh Người Bán</Link></li>
+              <li><Link to="/about" className="hover:text-indigo-600">Giới Thiệu Về {settings?.siteName || 'E-Commerce'}</Link></li>
+              <li><Link to="/careers" className="hover:text-indigo-600">Tuyển Dụng</Link></li>
+              <li><Link to="/terms" className="hover:text-indigo-600">Điều Khoản</Link></li>
+              <li><Link to="/privacy" className="hover:text-indigo-600">Chính Sách Bảo Mật</Link></li>
+              <li><Link to="/about" className="hover:text-indigo-600">Chính Hãng</Link></li>
+              <li><Link to="/seller" className="hover:text-indigo-600">Kênh Người Bán</Link></li>
             </ul>
           </div>
 

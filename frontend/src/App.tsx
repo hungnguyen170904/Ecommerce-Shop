@@ -20,6 +20,7 @@ import AdminBrandsPage from './pages/AdminBrandsPage';
 import AdminInventoryPage from './pages/AdminInventoryPage';
 import WishlistPage from './pages/WishlistPage';
 import ComparePage from './pages/ComparePage';
+import StaticPage from './pages/StaticPage';
 import { useAuthStore } from './store/useAuthStore';
 import { useSettingsStore } from './store/useSettingsStore';
 
@@ -69,6 +70,20 @@ function App() {
         <Route path="/product/:slug" element={<ProductDetailPage />} />
         <Route path="/category/:slug" element={<CategoryPage />} />
         <Route path="/compare" element={<ComparePage />} />
+        
+        {/* Các trang tĩnh (Static Pages) */}
+        <Route path="/notifications" element={<StaticPage title="Thông báo" />} />
+        <Route path="/help" element={<StaticPage title="Trung tâm hỗ trợ" />} />
+        <Route path="/about" element={<StaticPage title="Giới thiệu về cửa hàng" />} />
+        <Route path="/seller" element={<StaticPage title="Kênh người bán" />} />
+        <Route path="/terms" element={<StaticPage title="Điều khoản dịch vụ" />} />
+        <Route path="/privacy" element={<StaticPage title="Chính sách bảo mật" />} />
+        <Route path="/shipping" element={<StaticPage title="Vận chuyển & Giao hàng" />} />
+        <Route path="/returns" element={<StaticPage title="Trả hàng & Hoàn tiền" />} />
+        <Route path="/payment-guide" element={<StaticPage title="Hướng dẫn thanh toán" />} />
+        <Route path="/shopping-guide" element={<StaticPage title="Hướng dẫn mua hàng" />} />
+        <Route path="/selling-guide" element={<StaticPage title="Hướng dẫn bán hàng" />} />
+        <Route path="/careers" element={<StaticPage title="Tuyển dụng" />} />
         
         {/* Các trang yêu cầu Đăng nhập */}
         <Route 

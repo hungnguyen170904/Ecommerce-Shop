@@ -34,17 +34,17 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-9 text-xs font-medium text-slate-300">
             <div className="flex gap-4">
-              <Link to="#" className="hover:text-white transition-colors">Kênh Người Bán</Link>
+              <Link to="/seller" className="hover:text-white transition-colors">Kênh Người Bán</Link>
               <span className="text-slate-700">|</span>
-              <Link to="#" className="hover:text-white transition-colors">Trở thành Người bán</Link>
+              <Link to="/seller" className="hover:text-white transition-colors">Trở thành Người bán</Link>
               <span className="text-slate-700">|</span>
-              <Link to="#" className="hover:text-white transition-colors">Tải ứng dụng</Link>
+              <Link to="/help" className="hover:text-white transition-colors">Tải ứng dụng</Link>
             </div>
             <div className="flex items-center gap-6">
-              <Link to="#" className="flex items-center gap-1.5 hover:text-white transition-colors">
+              <Link to="/notifications" className="flex items-center gap-1.5 hover:text-white transition-colors">
                 <Bell className="w-3.5 h-3.5" /> Thông báo
               </Link>
-              <Link to="#" className="flex items-center gap-1.5 hover:text-white transition-colors">
+              <Link to="/help" className="flex items-center gap-1.5 hover:text-white transition-colors">
                 <HelpCircle className="w-3.5 h-3.5" /> Hỗ trợ
               </Link>
               <button className="flex items-center gap-1.5 hover:text-white transition-colors">
