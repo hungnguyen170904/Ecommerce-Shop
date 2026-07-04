@@ -97,12 +97,14 @@ export function Footer() {
         <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
           <p>© 2026 {settings?.siteName || 'E-Commerce'}. Tất cả các quyền được bảo lưu.</p>
           <div className="flex gap-4">
-            <span>Quốc gia & Khu vực:</span>
-            <Link to="#" className="hover:text-indigo-600">Việt Nam</Link>
+            <span>Khu vực hỗ trợ giao hàng:</span>
+            <span className="hover:text-indigo-600 cursor-pointer">Hà Nội</span>
             <span className="border-l border-slate-300"></span>
-            <Link to="#" className="hover:text-indigo-600">Singapore</Link>
+            <span className="hover:text-indigo-600 cursor-pointer">Hải Phòng</span>
             <span className="border-l border-slate-300"></span>
-            <Link to="#" className="hover:text-indigo-600">Thái Lan</Link>
+            <span className="hover:text-indigo-600 cursor-pointer">Đà Nẵng</span>
+            <span className="border-l border-slate-300"></span>
+            <span className="hover:text-indigo-600 cursor-pointer">TP. Hồ Chí Minh</span>
           </div>
         </div>
       </div>

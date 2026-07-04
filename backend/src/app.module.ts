@@ -16,9 +16,10 @@ import { EmailModule } from './email/email.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { UploadModule } from './upload/upload.module';
 import { BrandModule } from './brand/brand.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ProductModule, CartModule, OrderModule, CategoryModule, ReviewModule, UserModule, SettingModule, CouponModule, EmailModule, InventoryModule, UploadModule, BrandModule],
+  imports: [PrismaModule, AuthModule, ProductModule, CartModule, OrderModule, CategoryModule, ReviewModule, UserModule, SettingModule, CouponModule, EmailModule, InventoryModule, UploadModule, BrandModule, NotificationModule],
   controllers: [AppController],
   providers: [AppService],
 })
