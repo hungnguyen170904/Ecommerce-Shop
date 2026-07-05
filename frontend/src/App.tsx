@@ -23,6 +23,7 @@ import ComparePage from './pages/ComparePage';
 import ContentPage from './pages/ContentPage';
 import SellerLandingPage from './pages/SellerLandingPage';
 import NotificationsPage from './pages/NotificationsPage';
+import { Chatbot } from './components/Chatbot';
 import { useAuthStore } from './store/useAuthStore';
 import { useSettingsStore } from './store/useSettingsStore';
 
@@ -160,6 +161,7 @@ function App() {
           element={<AdminInventoryPage />} 
         />
       </Routes>
+      <Chatbot />
     </BrowserRouter>
   );
 }

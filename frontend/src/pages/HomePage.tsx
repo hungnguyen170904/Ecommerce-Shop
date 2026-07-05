@@ -5,6 +5,7 @@ import { Footer } from '../components/Footer';
 import { ProductCard } from '../components/ProductCard';
 import { apiClient } from '../api/axios';
 import { Loader2, ChevronRight, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -43,8 +44,13 @@ export default function HomePage() {
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
         
         {/* Bento Grid Hero Section */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up">
-          <div className="md:col-span-2 rounded-[32px] overflow-hidden aspect-[21/9] md:aspect-auto md:h-[420px] relative group shadow-soft hover:shadow-hover transition-all duration-500">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="md:col-span-2 rounded-[32px] overflow-hidden aspect-[21/9] md:aspect-auto md:h-[420px] relative group shadow-soft hover:shadow-hover transition-all duration-500"
+          >
             <img src={settings?.bannerUrl1 || heroProduct1?.images?.[0]?.url || "https://images.unsplash.com/photo-1605236453806-6ff36851218e?q=80&w=1200"} alt="Promo 1" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
             <div className="absolute bottom-10 left-10 text-white max-w-md">
@@ -55,9 +61,14 @@ export default function HomePage() {
                 Mua ngay <ChevronRight className="w-5 h-5" />
               </Link>
             </div>
-          </div>
+          </motion.div>
           
-          <div className="rounded-[32px] overflow-hidden aspect-[4/3] md:aspect-auto md:h-[420px] relative group shadow-soft hover:shadow-hover transition-all duration-500">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="rounded-[32px] overflow-hidden aspect-[4/3] md:aspect-auto md:h-[420px] relative group shadow-soft hover:shadow-hover transition-all duration-500"
+          >
             <img src={settings?.bannerUrl2 || heroProduct2?.images?.[0]?.url || "https://images.unsplash.com/photo-1542393545-10f5cde2c810?q=80&w=800"} alt="Promo 2" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
             <div className="absolute bottom-8 left-8 text-white">
@@ -68,7 +79,7 @@ export default function HomePage() {
                 Khám phá <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
-          </div>
+          </motion.div>
         </section>
 
         {/* Categories Menu */}
@@ -127,18 +138,43 @@ export default function HomePage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {products.map((product: any) => (
-                  <ProductCard key={product.id} product={product} />
+              <motion.div 
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: {
+                    opacity: 1,
+                    transition: { staggerChildren: 0.1 }
+                  }
+                }}
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+              >
+                {products.slice(0, 10).map((product: any) => (
+                  <motion.div
+                    key={product.id}
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+                    }}
+                  >
+                    <ProductCard product={product} />
+                  </motion.div>
                 ))}
-              </div>
-              <div className="mt-12 flex justify-center">
+              </motion.div>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mt-12 flex justify-center"
+              >
                 <Link to="/search">
                   <button className="bg-white border-2 border-slate-200 text-brand-dark px-10 py-4 rounded-2xl font-bold hover:border-brand-cta hover:text-brand-cta hover:shadow-hover hover:-translate-y-1 transition-all duration-300">
-                    Xem thêm sản phẩm
+                    Xem tất cả {products.length} sản phẩm
                   </button>
                 </Link>
-              </div>
+              </motion.div>
             </>
           )}
         </section>

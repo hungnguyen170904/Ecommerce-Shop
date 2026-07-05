@@ -4,7 +4,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useCompareStore } from '../store/useCompareStore';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 export function Navbar() {
   const user = useAuthStore((state) => state.user);
@@ -13,6 +13,8 @@ export function Navbar() {
   const compareItems = useCompareStore((state) => state.items);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (user) {
@@ -23,9 +25,20 @@ export function Navbar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+      setIsSearchFocused(false);
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <header className="bg-white sticky top-0 z-50 shadow-soft border-b border-slate-100">
@@ -79,12 +92,13 @@ export function Navbar() {
           </Link>
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-4xl w-full">
-            <form onSubmit={handleSearch} className="relative flex w-full h-12 bg-brand-bg rounded-xl border border-transparent focus-within:bg-white focus-within:border-brand-cta transition-all overflow-hidden shadow-inner">
+          <div ref={searchRef} className="flex-1 max-w-4xl w-full relative z-50">
+            <form onSubmit={handleSearch} className={`relative flex w-full h-12 bg-brand-bg rounded-xl border transition-all overflow-hidden shadow-inner ${isSearchFocused ? 'bg-white border-brand-cta ring-4 ring-brand-cta/10' : 'border-transparent'}`}>
               <input 
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setIsSearchFocused(true)}
                 placeholder="Tìm kiếm sản phẩm, thương hiệu..." 
                 className="flex-1 px-5 py-2 text-sm bg-transparent focus:outline-none text-brand-dark placeholder:text-slate-400 font-medium"
               />
@@ -95,12 +109,31 @@ export function Navbar() {
                 <Search className="h-5 w-5 text-white" />
               </button>
             </form>
-            <div className="hidden sm:flex gap-4 mt-2 text-xs font-medium text-brand-muted">
-              <Link to="/search?q=iphone" className="hover:text-brand-cta">iPhone 15</Link>
-              <Link to="/search?q=samsung" className="hover:text-brand-cta">Samsung S24</Link>
-              <Link to="/search?q=macbook" className="hover:text-brand-cta">MacBook Pro</Link>
-              <Link to="/search?q=sony" className="hover:text-brand-cta">Tai nghe Sony</Link>
-            </div>
+
+            {/* Dropdown Gợi ý tìm kiếm */}
+            {isSearchFocused && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] overflow-hidden">
+                <div className="p-4">
+                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Tìm kiếm phổ biến</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['iPhone 15 Pro Max', 'Samsung Galaxy S24', 'MacBook Air M3', 'Tai nghe Sony', 'Loa Marshall', 'Bàn phím cơ'].map((keyword) => (
+                      <button
+                        key={keyword}
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery(keyword);
+                          setIsSearchFocused(false);
+                          navigate(`/search?q=${encodeURIComponent(keyword)}`);
+                        }}
+                        className="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 text-sm font-medium rounded-lg transition-colors border border-slate-100"
+                      >
+                        {keyword}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Actions */}
