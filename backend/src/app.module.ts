@@ -17,9 +17,10 @@ import { InventoryModule } from './inventory/inventory.module';
 import { UploadModule } from './upload/upload.module';
 import { BrandModule } from './brand/brand.module';
 import { NotificationModule } from './notification/notification.module';
+import { ChatbotModule } from './chatbot/chatbot.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ProductModule, CartModule, OrderModule, CategoryModule, ReviewModule, UserModule, SettingModule, CouponModule, EmailModule, InventoryModule, UploadModule, BrandModule, NotificationModule],
+  imports: [PrismaModule, AuthModule, ProductModule, CartModule, OrderModule, CategoryModule, ReviewModule, UserModule, SettingModule, CouponModule, EmailModule, InventoryModule, UploadModule, BrandModule, NotificationModule, ChatbotModule],
   controllers: [AppController],
   providers: [AppService],
 })

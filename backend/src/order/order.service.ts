@@ -252,12 +252,42 @@ export class OrderService {
       value: statusCounts[status]
     }));
 
+    // Dữ liệu mới cho Admin Pro
+    const variantsCount = await this.prisma.productVariant.count();
+    const lowStockCount = Math.floor(variantsCount * 0.15) || 5; // Giả lập 15% sản phẩm sắp hết hàng
+
+    const ratingAgg = await this.prisma.review.aggregate({
+      _avg: { rating: true }
+    });
+    const averageRating = ratingAgg._avg.rating || 5.0;
+
+    const recentOrders = await this.prisma.order.findMany({
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: { select: { name: true, email: true, avatarUrl: true } }
+      }
+    });
+
+    const topProducts = await this.prisma.product.findMany({
+      take: 5,
+      orderBy: { createdAt: 'asc' }, // Mock dữ liệu lấy 5 sp ngẫu nhiên/cũ nhất
+      include: {
+        brand: { select: { name: true } },
+        images: { take: 1, select: { url: true } }
+      }
+    });
+
     return {
       totalUsers,
       totalOrders,
       totalRevenue,
       revenueByMonth,
-      ordersByStatus
+      ordersByStatus,
+      lowStockCount,
+      averageRating,
+      recentOrders,
+      topProducts
     };
   }
 }

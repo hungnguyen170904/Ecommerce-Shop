@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, User, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { apiClient } from '../api/axios';
 
 type Message = {
   id: number;
@@ -11,17 +12,10 @@ type Message = {
 
 const INITIAL_MESSAGE: Message = {
   id: 0,
-  text: 'Xin chào! Tôi là Trợ lý AI của cửa hàng. Tôi có thể giúp gì cho bạn hôm nay?',
+  text: 'Xin chào! Tôi là TechBot - Trợ lý AI của cửa hàng. Tôi có thể tư vấn sản phẩm nào cho bạn hôm nay?',
   sender: 'bot',
   timestamp: new Date()
 };
-
-const RESPONSES = [
-  { keywords: ['rẻ', 'dưới', 'triệu', 'bình dân'], reply: 'Bạn có thể tham khảo các dòng Samsung Galaxy A hoặc Xiaomi Redmi nhé. Mức giá rất sinh viên mà cấu hình lại cực ngon!' },
-  { keywords: ['iphone', 'apple', 'macbook'], reply: 'Chúng tôi đang có sẵn các dòng sản phẩm mới nhất của Apple với mức ưu đãi giảm 10% khi thanh toán qua thẻ!' },
-  { keywords: ['bảo hành', 'đổi trả', 'lỗi'], reply: 'Sản phẩm được bảo hành chính hãng 12 tháng và đổi trả 1-1 trong vòng 7 ngày nếu có lỗi từ nhà sản xuất bạn nhé.' },
-  { keywords: ['chào', 'hello', 'hi'], reply: 'Chào bạn! Cần tư vấn sản phẩm gì cứ nhắn cho mình nhé.' }
-];
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,7 +32,7 @@ export function Chatbot() {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!inputValue.trim()) return;
 
     const newUserMsg: Message = {
@@ -52,28 +46,29 @@ export function Chatbot() {
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI thinking and replying
-    setTimeout(() => {
-      const lowerInput = newUserMsg.text.toLowerCase();
-      let replyText = 'Dạ, hiện tại mình chưa hiểu rõ ý của bạn lắm. Bạn có thể nói rõ hơn được không ạ?';
+    try {
+      const response = await apiClient.post('/chatbot/message', { text: newUserMsg.text });
       
-      for (const res of RESPONSES) {
-        if (res.keywords.some(kw => lowerInput.includes(kw))) {
-          replyText = res.reply;
-          break;
-        }
-      }
-
       const botMsg: Message = {
         id: Date.now() + 1,
-        text: replyText,
+        text: response.data.reply,
         sender: 'bot',
         timestamp: new Date()
       };
       
       setMessages(prev => [...prev, botMsg]);
+    } catch (error) {
+      console.error('Lỗi khi gọi chatbot:', error);
+      const errorMsg: Message = {
+        id: Date.now() + 1,
+        text: 'Xin lỗi, kết nối đến hệ thống AI đang gặp sự cố. Bạn vui lòng thử lại sau nhé!',
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   return (
