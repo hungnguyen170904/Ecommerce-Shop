@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { ProductCard } from '../components/ProductCard';
+import { SkeletonLoading } from '../components/SkeletonLoading';
 import { apiClient } from '../api/axios';
-import { Loader2, ChevronRight, Zap } from 'lucide-react';
+import { ChevronRight, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function HomePage() {
@@ -17,11 +18,11 @@ export default function HomePage() {
     const fetchData = async () => {
       try {
         const [prodRes, catRes, setRes] = await Promise.all([
-          apiClient.get('/products'),
+          apiClient.get('/products?limit=10'), // Chỉ tải 10 sản phẩm mới nhất
           apiClient.get('/categories'),
           apiClient.get('/settings')
         ]);
-        setProducts(prodRes.data);
+        setProducts(prodRes.data.data || []);
         setCategories(catRes.data);
         setSettings(setRes.data);
       } catch (error) {
@@ -114,8 +115,8 @@ export default function HomePage() {
           </div>
           
           {isLoading ? (
-            <div className="flex justify-center items-center h-48">
-              <Loader2 className="w-8 h-8 animate-spin text-brand-cta" />
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              {[1, 2, 3, 4, 5].map((i) => <SkeletonLoading key={i} />)}
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
@@ -133,8 +134,8 @@ export default function HomePage() {
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <Loader2 className="w-8 h-8 animate-spin text-brand-cta" />
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => <SkeletonLoading key={i} />)}
             </div>
           ) : (
             <>

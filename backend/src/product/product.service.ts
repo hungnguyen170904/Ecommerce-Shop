@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ProductService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(search?: string, categorySlug?: string) {
+  async findAll(search?: string, categorySlug?: string, page: number = 1, limit: number = 20) {
     const where: any = { isActive: true };
 
     if (search) {
@@ -20,22 +20,39 @@ export class ProductService {
       };
     }
 
-    return this.prisma.product.findMany({
-      where,
-      include: {
-        images: {
-          orderBy: { sortOrder: 'asc' },
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          images: {
+            orderBy: { sortOrder: 'asc' },
+          },
+          brand: true,
+          categories: {
+            include: { category: true }
+          },
+          variants: {
+            where: { isActive: true },
+          },
         },
-        brand: true,
-        categories: {
-          include: { category: true }
-        },
-        variants: {
-          where: { isActive: true },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.product.count({ where })
+    ]);
+
+    return {
+      data: products,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
   }
 
   async findBySlug(slug: string) {

@@ -214,21 +214,34 @@ export class OrderService {
     const totalUsers = await this.prisma.user.count({ where: { role: 'USER' } });
     const totalOrders = await this.prisma.order.count();
     
-    // Doanh thu chỉ tính các đơn DELIVERED
-    const deliveredOrders = await this.prisma.order.findMany({
+    // Doanh thu tổng
+    const totalRevAgg = await this.prisma.order.aggregate({
       where: { status: 'DELIVERED' },
+      _sum: { totalAmount: true }
+    });
+    const totalRevenue = totalRevAgg._sum.totalAmount || 0;
+
+    // Tính doanh thu theo 6 tháng gần nhất (chỉ lấy data 6 tháng)
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+    sixMonthsAgo.setDate(1);
+    sixMonthsAgo.setHours(0, 0, 0, 0);
+
+    const recentDeliveredOrders = await this.prisma.order.findMany({
+      where: { 
+        status: 'DELIVERED',
+        createdAt: { gte: sixMonthsAgo }
+      },
       select: { totalAmount: true, createdAt: true }
     });
-    const totalRevenue = deliveredOrders.reduce((sum, order) => sum + order.totalAmount, 0);
 
-    // Tính doanh thu theo 6 tháng gần nhất
     const revenueByMonth = [];
     const today = new Date();
     for (let i = 5; i >= 0; i--) {
       const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const monthName = `T${d.getMonth() + 1}`;
       
-      const monthOrders = deliveredOrders.filter(o => {
+      const monthOrders = recentDeliveredOrders.filter(o => {
         const oDate = new Date(o.createdAt);
         return oDate.getMonth() === d.getMonth() && oDate.getFullYear() === d.getFullYear();
       });
@@ -237,19 +250,15 @@ export class OrderService {
       revenueByMonth.push({ name: monthName, total: monthRevenue });
     }
 
-    // Tính trạng thái đơn hàng
-    const allOrders = await this.prisma.order.findMany({
-      select: { status: true }
+    // Tính trạng thái đơn hàng (Tối ưu bằng SQL Group By)
+    const statusGroups = await this.prisma.order.groupBy({
+      by: ['status'],
+      _count: { status: true }
     });
     
-    const statusCounts = allOrders.reduce((acc: any, order) => {
-      acc[order.status] = (acc[order.status] || 0) + 1;
-      return acc;
-    }, {});
-    
-    const ordersByStatus = Object.keys(statusCounts).map(status => ({
-      name: status,
-      value: statusCounts[status]
+    const ordersByStatus = statusGroups.map(g => ({
+      name: g.status,
+      value: g._count.status
     }));
 
     // Dữ liệu mới cho Admin Pro

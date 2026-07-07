@@ -1,9 +1,10 @@
-import { Controller, Get, Param, Query, Post, Put, Delete, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, Post, Put, Delete, Body, UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
 import { ProductService } from './product.service';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('products')
 export class ProductController {
@@ -11,8 +12,17 @@ export class ProductController {
 
   // API Lấy toàn bộ sản phẩm đang kích hoạt (có hỗ trợ tìm kiếm)
   @Get()
-  findAll(@Query('search') search?: string, @Query('categorySlug') categorySlug?: string) {
-    return this.productService.findAll(search, categorySlug);
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(30000) // Cache 30s
+  findAll(
+    @Query('search') search?: string, 
+    @Query('categorySlug') categorySlug?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
+  ) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 20;
+    return this.productService.findAll(search, categorySlug, pageNum, limitNum);
   }
 
   // --- ADMIN APIs ---

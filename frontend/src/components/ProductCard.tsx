@@ -25,7 +25,7 @@ export function ProductCard({ product }: { product: Product }) {
   const isCompared = compareItems.some(item => item.id === product.id);
 
   return (
-    <div className="group bg-white rounded-[24px] overflow-hidden shadow-sm hover:shadow-hover hover:-translate-y-2 transition-all duration-500 flex flex-col relative">
+    <div className="group bg-white rounded-[24px] overflow-hidden shadow-sm hover:shadow-hover hover:-translate-y-2 transition-all duration-500 flex flex-col relative h-full">
       <Link 
         to={`/product/${product.slug}`} 
         className="flex flex-col flex-grow"
@@ -44,7 +44,7 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
       
       <div className="p-4 flex flex-col flex-grow">
-        <h3 className="font-bold text-slate-800 line-clamp-2 mb-1 group-hover:text-brand-cta transition-colors text-lg">
+        <h3 className="font-bold text-slate-800 line-clamp-2 mb-1 group-hover:text-brand-cta transition-colors text-lg min-h-[56px]">
           {product.name}
         </h3>
         <div className="mt-auto pt-3 flex items-center justify-between">

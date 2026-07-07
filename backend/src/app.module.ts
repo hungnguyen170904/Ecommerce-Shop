@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { CacheModule } from '@nestjs/cache-manager';
+import { APP_GUARD } from '@nestjs/core';
 
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
@@ -20,8 +23,23 @@ import { NotificationModule } from './notification/notification.module';
 import { ChatbotModule } from './chatbot/chatbot.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ProductModule, CartModule, OrderModule, CategoryModule, ReviewModule, UserModule, SettingModule, CouponModule, EmailModule, InventoryModule, UploadModule, BrandModule, NotificationModule, ChatbotModule],
+  imports: [
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100, // Tối đa 100 requests / 1 phút / IP
+    }]),
+    CacheModule.register({
+      isGlobal: true, // Biến cache thành global module
+      ttl: 30000, // Mặc định cache 30s
+    }),
+    PrismaModule, AuthModule, ProductModule, CartModule, OrderModule, CategoryModule, ReviewModule, UserModule, SettingModule, CouponModule, EmailModule, InventoryModule, UploadModule, BrandModule, NotificationModule, ChatbotModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    }
+  ],
 })
 export class AppModule {}

@@ -18,10 +18,10 @@ export default function CategoryPage() {
       setIsLoading(true);
       try {
         const [prodRes, catRes] = await Promise.all([
-          apiClient.get(`/products?categorySlug=${slug}`),
+          apiClient.get(`/products?categorySlug=${slug}&limit=50`),
           apiClient.get('/categories')
         ]);
-        setProducts(prodRes.data);
+        setProducts(prodRes.data.data || []);
         setCategories(catRes.data);
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu danh mục:', error);

@@ -110,6 +110,8 @@ model Category {
   children    Category[] @relation("SubCategories")
 
   productCategories ProductCategory[]
+
+  @@index([slug])
 }
 
 model Product {
@@ -132,6 +134,11 @@ model Product {
 
   // Implicit many-to-many for Wishlist
   wishlistedBy User[] @relation("UserWishlist")
+
+  @@index([slug])
+  @@index([name])
+  @@index([brandId])
+  @@index([isActive])
 }
 
 model ProductCategory {
@@ -175,6 +182,9 @@ model ProductVariant {
   orderItems            OrderItem[]
   purchaseOrderItems    PurchaseOrderItem[]
   inventoryTransactions InventoryTransaction[]
+
+  @@index([productId])
+  @@index([sku])
 }
 
 // -----------------------------------------------------------------------------
@@ -225,6 +235,10 @@ model Order {
   statusHistory OrderStatusHistory[]
   payments      PaymentTransaction[]
   shipment      Shipment?
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model OrderItem {

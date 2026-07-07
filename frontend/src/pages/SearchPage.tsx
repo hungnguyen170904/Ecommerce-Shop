@@ -37,11 +37,11 @@ export default function SearchPage() {
     setIsLoading(true);
     try {
       const [prodRes, catRes, brandRes] = await Promise.all([
-        apiClient.get('/products'), 
+        apiClient.get('/products?limit=100'), // Tạm thời tải 100 sản phẩm để client tự filter
         apiClient.get('/categories'),
         apiClient.get('/brands')
       ]);
-      setAllProducts(prodRes.data);
+      setAllProducts(prodRes.data.data || []);
       setCategories(catRes.data);
       setBrands(brandRes.data);
     } catch (error) {
