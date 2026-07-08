@@ -33,6 +33,22 @@ export class OrderService {
       };
     });
 
+    // Kiểm tra tồn kho trước khi tạo đơn hàng
+    for (const item of cart.items) {
+      const stockAgg = await this.prisma.inventoryTransaction.groupBy({
+        by: ['variantId'],
+        where: { variantId: item.variantId },
+        _sum: { quantity: true }
+      });
+      const currentStock = stockAgg[0]?._sum?.quantity ?? 0;
+      if (currentStock < item.quantity) {
+        const productName = item.variant.product.name;
+        throw new BadRequestException(
+          `Sản phẩm "${productName}" (${item.variant.color || item.variant.size || 'Mặc định'}) hiện chỉ còn ${currentStock} cái trong kho, không đủ để đặt ${item.quantity} cái.`
+        );
+      }
+    }
+
     // Xử lý Coupon
     let discountAmount = 0;
     let validCouponId = null;
@@ -129,16 +145,27 @@ export class OrderService {
     });
   }
 
-  async getAllOrdersForAdmin() {
-    return this.prisma.order.findMany({
-      include: {
-        items: {
-          include: { variant: { include: { product: true } } }
+  async getAllOrdersForAdmin(page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [orders, total] = await Promise.all([
+      this.prisma.order.findMany({
+        skip,
+        take: limit,
+        include: {
+          items: {
+            include: { variant: { include: { product: { select: { name: true } } } } },
+          },
+          user: { select: { name: true, email: true, phone: true } },
         },
-        user: { select: { name: true, email: true, phone: true } },
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+        orderBy: { createdAt: 'desc' }
+      }),
+      this.prisma.order.count()
+    ]);
+
+    return {
+      data: orders,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) }
+    };
   }
 
   async updateOrderStatus(orderId: string, status: any) {

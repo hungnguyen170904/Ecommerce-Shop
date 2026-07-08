@@ -172,7 +172,7 @@ export default function HomePage() {
               >
                 <Link to="/search">
                   <button className="bg-white border-2 border-slate-200 text-brand-dark px-10 py-4 rounded-2xl font-bold hover:border-brand-cta hover:text-brand-cta hover:shadow-hover hover:-translate-y-1 transition-all duration-300">
-                    Xem tất cả {products.length} sản phẩm
+                    Xem tất cả sản phẩm
                   </button>
                 </Link>
               </motion.div>

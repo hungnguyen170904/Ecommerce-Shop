@@ -16,8 +16,8 @@ export default function AdminOrdersPage() {
   const fetchOrders = async () => {
     setIsLoading(true);
     try {
-      const response = await apiClient.get('/orders/admin');
-      setOrders(response.data);
+      const response = await apiClient.get('/orders/admin?limit=50');
+      setOrders(response.data.data || response.data); // hỗ trợ cả 2 format
     } catch (error) {
       console.error('Lỗi khi tải danh sách đơn hàng', error);
     } finally {

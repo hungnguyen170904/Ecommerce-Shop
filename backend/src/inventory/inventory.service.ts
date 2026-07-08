@@ -22,34 +22,31 @@ export class InventoryService implements OnModuleInit {
   }
 
   async getInventory() {
-    // Get all variants and calculate their current stock
+    // Dùng SQL SUM để tính tồn kho trực tiếp trên Database, không load dữ liệu về Node.js
     const variants = await this.prisma.productVariant.findMany({
       include: {
         product: { select: { name: true, slug: true } },
-        inventoryTransactions: true
       }
     });
 
-    return variants.map(v => {
-      // Calculate stock based on event sourcing
-      const stock = v.inventoryTransactions.reduce((total, t) => {
-        if (t.type === 'IN') return total + t.quantity;
-        if (t.type === 'OUT') return total - Math.abs(t.quantity);
-        if (t.type === 'ADJUSTMENT') return total + t.quantity; // Can be negative or positive
-        return total;
-      }, 0);
-
-      return {
-        id: v.id,
-        productId: v.productId,
-        productName: v.product.name,
-        sku: v.sku,
-        color: v.color,
-        size: v.size,
-        price: v.price,
-        stock: stock
-      };
+    // Tính tồn kho bằng groupBy trực tiếp trên DB
+    const stockSums = await this.prisma.inventoryTransaction.groupBy({
+      by: ['variantId'],
+      _sum: { quantity: true }
     });
+
+    const stockMap = new Map(stockSums.map(s => [s.variantId, s._sum.quantity || 0]));
+
+    return variants.map(v => ({
+      id: v.id,
+      productId: v.productId,
+      productName: v.product.name,
+      sku: v.sku,
+      color: v.color,
+      size: v.size,
+      price: v.price,
+      stock: stockMap.get(v.id) ?? 0
+    }));
   }
 
   async addStock(variantId: string, quantity: number, notes?: string) {

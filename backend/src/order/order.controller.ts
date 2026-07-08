@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, Param, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Put, Param, Body, UseGuards, Request, Query } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -43,8 +43,8 @@ export class OrderController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @Get('admin')
-  getAllOrders() {
-    return this.orderService.getAllOrdersForAdmin();
+  getAllOrders(@Query('page') page = '1', @Query('limit') limit = '20') {
+    return this.orderService.getAllOrdersForAdmin(+page, +limit);
   }
 
   @UseGuards(RolesGuard)

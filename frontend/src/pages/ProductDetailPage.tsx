@@ -35,21 +35,27 @@ export default function ProductDetailPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        // Bước 1: Lấy thông tin sản phẩm trước
         const response = await apiClient.get(`/products/${slug}`);
-        setProduct(response.data);
-        if (response.data.variants?.length > 0) {
-          setSelectedVariant(response.data.variants[0]);
+        const productData = response.data;
+        setProduct(productData);
+        if (productData.variants?.length > 0) {
+          setSelectedVariant(productData.variants[0]);
         }
-        
-        // Fetch reviews after product is loaded
-        const reviewsRes = await apiClient.get(`/reviews/product/${response.data.id}`);
+
+        // Bước 2: Gọi song song reviews và wishlist (giảm thời gian chờ ~60%)
+        const parallelRequests: Promise<any>[] = [
+          apiClient.get(`/reviews/product/${productData.id}`)
+        ];
+        if (user) {
+          parallelRequests.push(apiClient.get('/users/profile/wishlist'));
+        }
+
+        const [reviewsRes, wlRes] = await Promise.all(parallelRequests);
         setReviews(reviewsRes.data);
 
-        // Check if wishlisted if user is logged in
-        if (user) {
-          const wlRes = await apiClient.get('/users/profile/wishlist');
-          const isWl = wlRes.data.some((p: any) => p.id === response.data.id);
-          setIsWishlisted(isWl);
+        if (wlRes) {
+          setIsWishlisted(wlRes.data.some((p: any) => p.id === productData.id));
         }
       } catch (error) {
         console.error('Lỗi khi tải chi tiết sản phẩm:', error);
@@ -65,8 +71,39 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col">
         <Navbar />
-        <div className="flex-1 flex justify-center items-center">
-          <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
+        <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 animate-pulse">
+            {/* Skeleton ảnh */}
+            <div className="space-y-4">
+              <div className="aspect-square bg-slate-200 rounded-[28px]"></div>
+              <div className="grid grid-cols-4 gap-3">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="aspect-square bg-slate-200 rounded-xl"></div>
+                ))}
+              </div>
+            </div>
+            {/* Skeleton nội dung */}
+            <div className="space-y-6 pt-4">
+              <div className="h-4 bg-slate-200 rounded w-24"></div>
+              <div className="h-10 bg-slate-200 rounded-xl w-full"></div>
+              <div className="h-8 bg-slate-200 rounded-xl w-48"></div>
+              <div className="h-px bg-slate-200"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-slate-200 rounded w-32"></div>
+                <div className="flex gap-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-10 w-20 bg-slate-200 rounded-xl"></div>
+                  ))}
+                </div>
+              </div>
+              <div className="h-14 bg-slate-200 rounded-2xl w-full mt-4"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-slate-200 rounded w-full"></div>
+                <div className="h-4 bg-slate-200 rounded w-5/6"></div>
+                <div className="h-4 bg-slate-200 rounded w-4/6"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

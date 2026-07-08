@@ -5,6 +5,21 @@ import { PrismaService } from '../prisma/prisma.service';
 export class CartService {
   constructor(private prisma: PrismaService) {}
 
+  // Hàm nội bộ để chỉ lấy cartId (nhẹ hơn getCart đầy đủ)
+  private async getOrCreateCartId(userId: string): Promise<string> {
+    let cart = await this.prisma.cart.findUnique({
+      where: { userId },
+      select: { id: true }
+    });
+    if (!cart) {
+      cart = await this.prisma.cart.create({
+        data: { userId },
+        select: { id: true }
+      });
+    }
+    return cart.id;
+  }
+
   async getCart(userId: string) {
     let cart = await this.prisma.cart.findUnique({
       where: { userId },
@@ -12,7 +27,7 @@ export class CartService {
         items: {
           include: {
             variant: {
-              include: { product: { include: { images: true } } }
+              include: { product: { include: { images: { take: 1, orderBy: { sortOrder: 'asc' } } } } }
             }
           }
         }
@@ -26,7 +41,7 @@ export class CartService {
           items: {
             include: {
               variant: {
-                include: { product: { include: { images: true } } }
+                include: { product: { include: { images: { take: 1, orderBy: { sortOrder: 'asc' } } } } }
               }
             }
           }
@@ -38,9 +53,13 @@ export class CartService {
   }
 
   async addToCart(userId: string, variantId: string, quantity: number) {
-    const cart = await this.getCart(userId);
+    const cartId = await this.getOrCreateCartId(userId);
 
-    const existingItem = cart.items.find(item => item.variantId === variantId);
+    // Kiểm tra item đã có trong giỏ chưa
+    const existingItem = await this.prisma.cartItem.findFirst({
+      where: { cartId, variantId },
+      select: { id: true, quantity: true }
+    });
 
     if (existingItem) {
       await this.prisma.cartItem.update({
@@ -49,25 +68,25 @@ export class CartService {
       });
     } else {
       await this.prisma.cartItem.create({
-        data: {
-          cartId: cart.id,
-          variantId,
-          quantity,
-        },
+        data: { cartId, variantId, quantity },
       });
     }
 
-    return this.getCart(userId);
+    return this.getCart(userId); // Chỉ gọi 1 lần ở đây
   }
 
   async updateQuantity(userId: string, itemId: string, quantity: number) {
-    const cart = await this.getCart(userId);
-    const item = cart.items.find(i => i.id === itemId);
-    if (!item) throw new Error('Item not found in cart');
-
     if (quantity <= 0) {
       return this.removeItem(userId, itemId);
     }
+
+    // Kiểm tra item thuộc về user này không (bảo mật)
+    const cartId = await this.getOrCreateCartId(userId);
+    const item = await this.prisma.cartItem.findFirst({
+      where: { id: itemId, cartId },
+      select: { id: true }
+    });
+    if (!item) throw new Error('Không tìm thấy sản phẩm trong giỏ hàng');
 
     await this.prisma.cartItem.update({
       where: { id: itemId },
@@ -77,13 +96,15 @@ export class CartService {
   }
 
   async removeItem(userId: string, itemId: string) {
-    const cart = await this.getCart(userId);
-    const item = cart.items.find(i => i.id === itemId);
-    if (!item) return cart;
-
-    await this.prisma.cartItem.delete({
-      where: { id: itemId }
+    // Kiểm tra item thuộc về user này không (bảo mật)
+    const cartId = await this.getOrCreateCartId(userId);
+    const item = await this.prisma.cartItem.findFirst({
+      where: { id: itemId, cartId },
+      select: { id: true }
     });
+    if (!item) return this.getCart(userId);
+
+    await this.prisma.cartItem.delete({ where: { id: itemId } });
     return this.getCart(userId);
   }
 }

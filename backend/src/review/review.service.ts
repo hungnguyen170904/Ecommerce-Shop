@@ -13,26 +13,30 @@ export class ReviewService {
         status: 'DELIVERED',
         items: {
           some: {
-            variant: {
-              productId
-            }
+            variant: { productId }
           }
         }
-      }
+      },
+      select: { id: true } // Chỉ cần biết có tồn tại hay không
     });
 
     if (!hasBought) {
       throw new BadRequestException('Bạn chỉ có thể đánh giá sản phẩm sau khi đã mua và nhận hàng thành công.');
     }
 
-    // 2. Tạo Review
+    // 2. Kiểm tra xem đã đánh giá sản phẩm này chưa (tránh trùng lặp)
+    const existingReview = await this.prisma.review.findFirst({
+      where: { userId, productId },
+      select: { id: true }
+    });
+
+    if (existingReview) {
+      throw new BadRequestException('Bạn đã đánh giá sản phẩm này rồi. Mỗi sản phẩm chỉ được đánh giá 1 lần.');
+    }
+
+    // 3. Tạo Review
     return this.prisma.review.create({
-      data: {
-        userId,
-        productId,
-        rating,
-        comment
-      }
+      data: { userId, productId, rating, comment }
     });
   }
 
