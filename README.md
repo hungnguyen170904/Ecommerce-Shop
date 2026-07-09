@@ -1,72 +1,96 @@
-# 🚀 Modern E-Commerce Platform
+<div align="center">
+  <h1>🛒 Modern Tech E-Commerce Platform</h1>
+  <p>Hệ thống bán hàng trực tuyến thiết bị công nghệ hiện đại, hiệu năng cao và bảo mật.</p>
 
-Chào mừng bạn đến với dự án **E-Commerce Platform** - một hệ thống bán hàng trực tuyến hiện đại, mạnh mẽ và toàn diện, được xây dựng dựa trên những công nghệ web tiên tiến nhất năm 2025-2026.
+  <!-- Badges -->
+  <p>
+    <img src="https://img.shields.io/badge/React-19-blue.svg?style=for-the-badge&logo=react" alt="React" />
+    <img src="https://img.shields.io/badge/Vite-5.0-646CFF.svg?style=for-the-badge&logo=vite" alt="Vite" />
+    <img src="https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC.svg?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" />
+    <img src="https://img.shields.io/badge/NestJS-11-E0234E.svg?style=for-the-badge&logo=nestjs" alt="NestJS" />
+    <img src="https://img.shields.io/badge/Prisma-ORM-2D3748.svg?style=for-the-badge&logo=prisma" alt="Prisma" />
+    <img src="https://img.shields.io/badge/PostgreSQL-16-336791.svg?style=for-the-badge&logo=postgresql" alt="PostgreSQL" />
+  </p>
+</div>
 
-Dự án áp dụng thiết kế theo phong cách **Minimalism** kết hợp với **Bento Grid** để mang lại trải nghiệm người dùng (UX/UI) mượt mà, chuyên nghiệp và tối ưu nhất.
+<br />
 
----
-
-## ✨ Điểm nổi bật (Features)
-
-### Dành cho Người dùng (Customer Facing)
-- 🛍️ **Giao diện Bento Grid:** Thiết kế lưới hiện đại, bo góc mềm mại, tạo điểm nhấn thị giác cực mạnh.
-- 📱 **Responsive 100%:** Hiển thị hoàn hảo trên mọi kích thước màn hình (Mobile, Tablet, Desktop).
-- 🔐 **Xác thực an toàn:** Đăng nhập, đăng ký bằng JWT.
-- 🛒 **Giỏ hàng & Thanh toán:** Giỏ hàng mượt mà, hỗ trợ cấu hình thanh toán chuyển khoản (QR Code).
-- 💖 **Tính năng tiện ích:** Danh sách yêu thích (Wishlist), So sánh sản phẩm (Compare).
-- 🔍 **Tìm kiếm & Lọc:** Tìm kiếm nhanh chóng, lọc theo danh mục, nhãn hàng.
-
-### Dành cho Quản trị viên (Admin Panel)
-- 📊 **Dashboard Thống kê:** Theo dõi doanh thu, đơn hàng, khách hàng trực quan.
-- 📦 **Quản lý Sản phẩm & Kho hàng (ERP):** Theo dõi số lượng tồn kho, nhập hàng, quản lý biến thể (Variants).
-- ⚙️ **Cài đặt Hệ thống:** Cho phép thay đổi Tên shop, Logo, Banner quảng cáo và thông tin ngân hàng ngay từ giao diện Admin.
-- 🧾 **Quản lý Đơn hàng:** Cập nhật trạng thái đơn hàng (Đang xử lý, Đang giao, Hoàn thành).
+Chào mừng bạn đến với dự án **Tech E-Commerce Platform** - một nền tảng thương mại điện tử chuyên nghiệp, được tinh chỉnh tối đa về hiệu năng, bảo mật và trải nghiệm người dùng (UX/UI). Hệ thống áp dụng phong cách thiết kế **Modern Web 2025** với Glassmorphism, Animation mượt mà và Layout tối ưu.
 
 ---
 
-## 🛠️ Công nghệ sử dụng (Tech Stack)
+## 📑 Mục lục
+
+- [✨ Tính năng nổi bật](#-tính-năng-nổi-bật)
+- [🛠️ Công nghệ sử dụng](#-công-nghệ-sử-dụng)
+- [🚀 Hướng dẫn cài đặt](#-hướng-dẫn-cài-đặt)
+- [🏗️ Cấu trúc thư mục](#-cấu-trúc-thư-mục)
+- [💡 Lưu ý](#-lưu-ý)
+
+---
+
+## ✨ Tính năng nổi bật
+
+### 🛍️ Dành cho Khách hàng (Storefront)
+- **Giao diện Modern Web 2025:** Tone màu xanh dương nhẹ nhàng, sử dụng Glassmorphism, Hero Slider tự động chạy, Animation cuộn trang và hover mượt mà.
+- **Tối ưu tốc độ (Performance):** Gọi API song song (Promise.all) kết hợp với Skeleton Loading để giảm thời gian chờ lên đến 60%.
+- **Chức năng Mua sắm Toàn diện:** 
+  - Xem chi tiết sản phẩm, biến thể (Variants - màu sắc/kích thước).
+  - Thêm vào Giỏ hàng (Cart) với kiểm tra tồn kho realtime.
+  - Danh sách Yêu thích (Wishlist) và So sánh Sản phẩm (Compare).
+- **Thanh toán & Đơn hàng:** Checkout an toàn, tự động tính giảm giá (Coupon), hủy đơn hàng, yêu cầu hoàn trả.
+- **Đánh giá Sản phẩm:** Hệ thống chống spam, một người dùng chỉ được đánh giá 1 lần cho 1 sản phẩm.
+
+### 🛡️ Dành cho Quản trị viên (Admin Panel)
+- **Dashboard Thống kê:** Theo dõi doanh thu, số lượng đơn hàng, khách hàng mới theo thời gian thực.
+- **Quản lý ERP Kho hàng:** Quản lý lượng tồn kho chính xác thông qua `InventoryTransaction`.
+- **Cấu hình Hệ thống (Settings):** Đổi tên shop, Logo, Banner quảng cáo, Thông tin thanh toán (QR Code) trực tiếp từ giao diện không cần sửa code.
+- **Quản lý Vận hành:** Xét duyệt đơn hàng, quản lý người dùng, thiết lập mã giảm giá (Coupon).
+
+---
+
+## 🛠️ Công nghệ sử dụng
 
 ### Frontend (Client-side)
-- **Framework:** React 19 (Vite)
-- **Styling:** Tailwind CSS v4 (Cấu hình custom utilities hiện đại)
-- **State Management:** Zustand (Quản lý state siêu nhẹ, hiệu quả)
-- **Routing:** React Router v6
-- **Icons:** Lucide React
-- **HTTP Client:** Axios (Tích hợp Interceptors xử lý token)
+* **Core:** React 19, TypeScript, Vite
+* **Styling:** Tailwind CSS v4 (với Custom Theme Tokens)
+* **State Management:** Zustand
+* **Routing:** React Router v6
+* **Icons & Animation:** Lucide React, Framer Motion
+* **Network:** Axios (tích hợp Interceptors xử lý JWT Token)
 
 ### Backend (Server-side)
-- **Framework:** NestJS 11 (Cấu trúc module hóa, Clean Architecture)
-- **Database ORM:** Prisma (Type-safe database client)
-- **Database:** PostgreSQL (Mạnh mẽ, hỗ trợ transaction và relation phức tạp)
-- **Authentication:** Passport, JWT (JSON Web Tokens)
-- **File Storage:** Multer (Upload và phục vụ file tĩnh/hình ảnh)
+* **Core:** NestJS 11, TypeScript
+* **Database & ORM:** PostgreSQL, Prisma ORM
+* **Authentication:** Passport, JWT (JSON Web Tokens)
+* **Hiệu năng & Bảo mật:** Helmet, Compression, API Rate Limiting (Throttler), Cache-Manager
+* **Tối ưu DB:** Đã cấu hình Composite Indexes và Unique Constraints để chống Race Condition.
 
 ---
 
-## 🚀 Hướng dẫn cài đặt (Getting Started)
+## 🚀 Hướng dẫn cài đặt
 
-### 1. Yêu cầu hệ thống
-- Node.js (v18 trở lên)
-- PostgreSQL (Đang chạy ở máy local hoặc server)
-- Trình quản lý package: `npm` hoặc `yarn`
+### 1. Yêu cầu môi trường
+- Node.js (v18.x trở lên)
+- PostgreSQL (Đã cài đặt local hoặc sử dụng dịch vụ Cloud như Neon/Supabase)
 
 ### 2. Cài đặt Backend
-Di chuyển vào thư mục `backend` và cài đặt các thư viện:
+Di chuyển vào thư mục `backend`:
 ```bash
 cd backend
 npm install
 ```
 
-Cấu hình biến môi trường bằng cách tạo file `.env` ở thư mục `backend`:
+Tạo file `.env` ở thư mục `backend`:
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/ecommerce_db?schema=public"
 JWT_SECRET="your-super-secret-jwt-key"
 PORT=3000
 ```
 
-Chạy Migration và khởi tạo dữ liệu mẫu (Seed):
+Khởi tạo Database và Seed dữ liệu mẫu:
 ```bash
-npx prisma migrate dev --name init
+npx prisma db push
 npm run seed:excel
 ```
 
@@ -74,10 +98,10 @@ Chạy server Backend:
 ```bash
 npm run start:dev
 ```
-*(Server sẽ chạy tại `http://localhost:3000`)*
+*API sẽ chạy tại: `http://localhost:3000`*
 
 ### 3. Cài đặt Frontend
-Di chuyển vào thư mục `frontend` và cài đặt các thư viện:
+Mở một terminal mới, di chuyển vào thư mục `frontend`:
 ```bash
 cd frontend
 npm install
@@ -87,32 +111,37 @@ Chạy server Frontend:
 ```bash
 npm run dev
 ```
-*(Giao diện sẽ chạy tại `http://localhost:5173`)*
+*Giao diện sẽ chạy tại: `http://localhost:5173`*
 
 ---
 
-## 🏗️ Cấu trúc thư mục chính (Folder Structure)
+## 🏗️ Cấu trúc thư mục
 
 ```text
 EcommerceWeb/
-├── backend/                  # Mã nguồn NestJS
-│   ├── prisma/               # Database Schema & Seeders
-│   ├── src/                  # Các module API (User, Product, Order, Settings...)
-│   └── uploads/              # Nơi lưu trữ hình ảnh tải lên (Logo, Banner)
-└── frontend/                 # Mã nguồn React
+├── backend/                  # NestJS API Server
+│   ├── prisma/               # Schema, Migrations & Seeders
+│   ├── src/                  # Controllers, Services, Modules (Domain Driven)
+│   └── uploads/              # Lưu trữ hình ảnh tĩnh (Logo, Banners)
+│
+└── frontend/                 # React UI Application
     ├── src/
-    │   ├── api/              # Axios instance & cấu hình gọi API
-    │   ├── components/       # Các UI components dùng chung (Navbar, Footer, Button...)
-    │   ├── pages/            # Các trang giao diện (Home, Admin, ProductDetail...)
-    │   └── store/            # Quản lý state bằng Zustand
-    └── index.css             # Cấu hình Tailwind CSS v4
+    │   ├── api/              # Axios instance setup
+    │   ├── components/       # Reusable UI components (Navbar, Footer, ProductCard)
+    │   ├── pages/            # Page layouts (Home, Admin, Product Details)
+    │   └── store/            # Zustand global state (Auth, Cart, Compare, Settings)
+    └── index.css             # Tailwind v4 configuration & Custom Animations
 ```
 
 ---
 
 ## 💡 Lưu ý
-- Khi upload Logo hoặc Banner từ trang Quản trị, ảnh sẽ được lưu tự động vào thư mục `backend/uploads/` và được phục vụ công khai qua route tĩnh `/uploads/...`
-- Tài khoản quản trị mặc định (sau khi chạy seed) hãy sử dụng email và mật khẩu được cấu hình trong file `seed.ts`.
 
----
-*Phát triển với ❤️ cho trải nghiệm mua sắm tuyệt vời nhất!*
+- **Tài khoản mặc định:** Sau khi chạy Seed, bạn có thể kiểm tra file `backend/src/prisma/seed.ts` để lấy tài khoản Admin mặc định.
+- **Upload Hình ảnh:** Các hình ảnh hệ thống (Logo, Banner) được quản lý qua `SettingsController` và lưu tại thư mục `backend/uploads`. Chúng được phục vụ dưới dạng file tĩnh `/uploads/...`.
+- **Đồng bộ Schema:** Nếu bạn có thay đổi cấu trúc Database (`schema.prisma`), hãy nhớ chạy `npx prisma generate` và `npx prisma db push` để cập nhật.
+
+<br />
+<div align="center">
+  <i>Được phát triển với niềm đam mê mang lại trải nghiệm thương mại điện tử hoàn hảo!</i>
+</div>
