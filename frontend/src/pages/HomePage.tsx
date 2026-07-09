@@ -34,11 +34,11 @@ const HERO_SLIDES = [
     bg: 'from-sky-900 via-sky-800 to-cyan-800',
     badge: 'Hàng chính hãng',
     badgeColor: 'bg-emerald-400/20 text-emerald-200 border-emerald-400/30',
-    title: 'Thời Trang\nHiện Đại',
-    subtitle: 'Phong cách sống hiện đại với bộ sưu tập thời trang và phụ kiện mới nhất.',
-    cta: 'Xem bộ sưu tập',
-    ctaLink: '/search',
-    img: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800&auto=format&fit=crop',
+    title: 'Laptop &\nMáy Tính',
+    subtitle: 'Chinh phục mọi thử thách với dòng laptop mạnh mẽ từ Apple, Dell, ASUS và Lenovo.',
+    cta: 'Xem dòng Laptop',
+    ctaLink: '/search?q=laptop',
+    img: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=800&auto=format&fit=crop',
   },
 ];
 
@@ -98,21 +98,21 @@ function CountdownBlock({ value, label }: { value: number; label: string }) {
   );
 }
 
-// ===== SIDE BANNERS =====
+// ===== SIDE BANNERS — Chủ đề Công Nghệ =====
 const SIDE_BANNERS = [
   {
-    img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&auto=format&fit=crop',
-    badge: 'Phụ kiện',
-    title: 'Đồng Hồ Cao Cấp',
-    sub: 'Giảm đến 30%',
-    link: '/search?q=đồng hồ',
+    img: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop',
+    badge: 'Điện Thoại',
+    title: 'iPhone & Samsung',
+    sub: 'Giảm đến 20%',
+    link: '/search?q=điện thoại',
   },
   {
-    img: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?q=80&w=600&auto=format&fit=crop',
-    badge: 'Hot Deal',
-    title: 'Mỹ Phẩm & Làm Đẹp',
-    sub: 'Hàng chính hãng',
-    link: '/search?q=mỹ phẩm',
+    img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop',
+    badge: 'Tai Nghe',
+    title: 'Tai Nghe Cao Cấp',
+    sub: 'Chính hãng Sony, JBL',
+    link: '/search?q=tai nghe',
   },
 ];
 
@@ -174,10 +174,10 @@ export default function HomePage() {
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
 
         {/* ===== HERO: Slider to bên trái + 2 banner nhỏ bên phải ===== */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-auto lg:h-[440px]">
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4" style={{ height: 'auto' }}>
 
           {/* Slider lớn — chiếm 2/3 */}
-          <div className="lg:col-span-2 rounded-[28px] overflow-hidden relative shadow-blue bg-blue-900 h-[300px] lg:h-full">
+          <div className="lg:col-span-2 rounded-[28px] overflow-hidden relative shadow-blue bg-blue-900" style={{ height: '360px' }}>
             {/* Slide hình nền */}
             <AnimatePresence initial={false} custom={direction} mode="popLayout">
               <motion.div
@@ -237,7 +237,7 @@ export default function HomePage() {
           </div>
 
           {/* 2 Banner nhỏ bên phải */}
-          <div className="flex flex-row lg:flex-col gap-4 h-[200px] lg:h-full">
+          <div className="flex flex-col gap-4" style={{ height: '360px' }}>
             {SIDE_BANNERS.map((banner, i) => (
               <Link
                 key={i}
