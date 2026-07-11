@@ -1,6 +1,6 @@
 <div align="center">
-  <h1>🛒 Modern Tech E-Commerce Platform</h1>
-  <p>Hệ thống bán hàng trực tuyến thiết bị công nghệ hiện đại, hiệu năng cao và bảo mật.</p>
+  <h1>🛒 Tech E-Commerce Platform</h1>
+  <p>Hệ thống bán hàng trực tuyến thiết bị công nghệ toàn diện với kiến trúc Micro-services ready, ERP tích hợp và giao diện Modern Web 2025.</p>
 
   <!-- Badges -->
   <p>
@@ -15,56 +15,72 @@
 
 <br />
 
-Chào mừng bạn đến với dự án **Tech E-Commerce Platform** - một nền tảng thương mại điện tử chuyên nghiệp, được tinh chỉnh tối đa về hiệu năng, bảo mật và trải nghiệm người dùng (UX/UI). Hệ thống áp dụng phong cách thiết kế **Modern Web 2025** với Glassmorphism, Animation mượt mà và Layout tối ưu.
+Chào mừng bạn đến với dự án **Tech E-Commerce Platform** - một nền tảng thương mại điện tử cấp độ doanh nghiệp (Enterprise-level), được thiết kế đặc biệt cho việc kinh doanh các thiết bị công nghệ (Điện thoại, Laptop, Tai nghe, Smartwatch...). Hệ thống không chỉ có giao diện tuyệt đẹp (UX/UI tối ưu) mà còn sở hữu một Backend mạnh mẽ với các module quản lý kho (ERP), điểm thưởng (Loyalty) và mã giảm giá (Coupon) phức tạp.
 
 ---
 
 ## 📑 Mục lục
 
-- [✨ Tính năng nổi bật](#-tính-năng-nổi-bật)
-- [🛠️ Công nghệ sử dụng](#-công-nghệ-sử-dụng)
+- [🌟 Chức năng cốt lõi (Core Features)](#-chức-năng-cốt-lõi-core-features)
+- [🏗️ Kiến trúc & Công nghệ](#-kiến-trúc--công-nghệ)
 - [🚀 Hướng dẫn cài đặt](#-hướng-dẫn-cài-đặt)
-- [🏗️ Cấu trúc thư mục](#-cấu-trúc-thư-mục)
-- [💡 Lưu ý](#-lưu-ý)
+- [📁 Cấu trúc thư mục](#-cấu-trúc-thư-mục)
 
 ---
 
-## ✨ Tính năng nổi bật
+## 🌟 Chức năng cốt lõi (Core Features)
 
-### 🛍️ Dành cho Khách hàng (Storefront)
-- **Giao diện Modern Web 2025:** Tone màu xanh dương nhẹ nhàng, sử dụng Glassmorphism, Hero Slider tự động chạy, Animation cuộn trang và hover mượt mà.
-- **Tối ưu tốc độ (Performance):** Gọi API song song (Promise.all) kết hợp với Skeleton Loading để giảm thời gian chờ lên đến 60%.
-- **Chức năng Mua sắm Toàn diện:** 
-  - Xem chi tiết sản phẩm, biến thể (Variants - màu sắc/kích thước).
-  - Thêm vào Giỏ hàng (Cart) với kiểm tra tồn kho realtime.
-  - Danh sách Yêu thích (Wishlist) và So sánh Sản phẩm (Compare).
-- **Thanh toán & Đơn hàng:** Checkout an toàn, tự động tính giảm giá (Coupon), hủy đơn hàng, yêu cầu hoàn trả.
-- **Đánh giá Sản phẩm:** Hệ thống chống spam, một người dùng chỉ được đánh giá 1 lần cho 1 sản phẩm.
+### 🛍️ Storefront (Dành cho Khách hàng)
+- **UI/UX Đột phá:** Giao diện **Modern Web 2025** với Glassmorphism, Hero Slider mượt mà, hiệu ứng nổi (shimmer/float) và Skeleton Loading chuyên nghiệp. Đảm bảo tốc độ tải trang cực nhanh nhờ cơ chế fetch API song song (Promise.all).
+- **Trải nghiệm mua sắm:**
+  - Danh mục sản phẩm công nghệ đa dạng với bộ lọc thông minh (Brand, Category).
+  - Chi tiết sản phẩm với hệ thống **Biến thể (Variants)** phức tạp (Màu sắc, Dung lượng, SKU riêng biệt, Giá tùy chỉnh).
+  - So sánh sản phẩm (Compare) và Danh sách yêu thích (Wishlist).
+- **Giỏ hàng & Thanh toán:**
+  - Kiểm tra tồn kho **Real-time** ngay khi người dùng thao tác thêm vào giỏ hoặc thanh toán.
+  - Hỗ trợ nhiều phương thức thanh toán (COD, Chuyển khoản QR Code với Provider Ref ID).
+- **Tương tác & Khuyến mãi:**
+  - Hệ thống áp dụng **Coupon thông minh** (Giảm theo % hoặc số tiền cố định, giới hạn lượt dùng toàn hệ thống, tự động chặn spam).
+  - Đánh giá sản phẩm (Review) với ràng buộc dữ liệu chặt chẽ (1 user chỉ được đánh giá 1 lần cho 1 sản phẩm).
+  - Tích điểm thưởng (Loyalty Points) và Hạng thành viên (Tiers).
+- **Cá nhân hóa:** Quản lý sổ địa chỉ giao hàng (Multiple Addresses), lịch sử đơn hàng chi tiết và hệ thống thông báo trong ứng dụng (In-app Notifications).
 
-### 🛡️ Dành cho Quản trị viên (Admin Panel)
-- **Dashboard Thống kê:** Theo dõi doanh thu, số lượng đơn hàng, khách hàng mới theo thời gian thực.
-- **Quản lý ERP Kho hàng:** Quản lý lượng tồn kho chính xác thông qua `InventoryTransaction`.
-- **Cấu hình Hệ thống (Settings):** Đổi tên shop, Logo, Banner quảng cáo, Thông tin thanh toán (QR Code) trực tiếp từ giao diện không cần sửa code.
-- **Quản lý Vận hành:** Xét duyệt đơn hàng, quản lý người dùng, thiết lập mã giảm giá (Coupon).
+### 🏢 Admin Panel & ERP (Dành cho Quản trị viên)
+- **Dashboard Thống kê:** Báo cáo doanh thu, số lượng đơn hàng, và tăng trưởng khách hàng theo thời gian thực.
+- **Quản lý Kho hàng (Inventory ERP):**
+  - Quản lý đa kho (Warehouses).
+  - Quản lý Nhà cung cấp (Suppliers) và Tạo Đơn đặt hàng nhập kho (Purchase Orders - PO).
+  - Ghi nhận lịch sử giao dịch kho (Inventory Transactions: IN, OUT, ADJUSTMENT) để đảm bảo tính toàn vẹn dữ liệu, không dùng phép tính trừ đơn thuần.
+- **Quản lý Đơn hàng & Vận chuyển:**
+  - Theo dõi vòng đời đơn hàng (Pending -> Processing -> Shipped -> Delivered -> Cancelled).
+  - Tích hợp Module Giao hàng (Shipment) với Mã vận đơn (Tracking Number) và Đơn vị vận chuyển (Courier).
+  - Quy trình hoàn trả hàng (Return/Refund) chuẩn chỉ.
+- **Quản lý Hệ thống (Dynamic Settings):**
+  - Thay đổi cấu hình trang web (Tên Website, Logo, Banner quảng cáo) trực tiếp trên giao diện Admin, không cần can thiệp code. (Sử dụng module Upload File lưu trữ tại backend).
 
 ---
 
-## 🛠️ Công nghệ sử dụng
+## 🏗️ Kiến trúc & Công nghệ
 
 ### Frontend (Client-side)
-* **Core:** React 19, TypeScript, Vite
-* **Styling:** Tailwind CSS v4 (với Custom Theme Tokens)
-* **State Management:** Zustand
-* **Routing:** React Router v6
-* **Icons & Animation:** Lucide React, Framer Motion
-* **Network:** Axios (tích hợp Interceptors xử lý JWT Token)
+* **Core:** React 19, TypeScript, Vite (Tốc độ build siêu tốc).
+* **Styling:** Tailwind CSS v4 (Custom Theme Tokens: `color-brand-bg`, `shadow-soft`, animations custom).
+* **State Management:** Zustand (Nhẹ, dễ scale cho Auth, Cart, Compare).
+* **Network & Data:** Axios (Interceptors xử lý Refresh Token, Authorization).
+* **Icons & Animation:** Lucide React, Framer Motion.
 
 ### Backend (Server-side)
-* **Core:** NestJS 11, TypeScript
-* **Database & ORM:** PostgreSQL, Prisma ORM
-* **Authentication:** Passport, JWT (JSON Web Tokens)
-* **Hiệu năng & Bảo mật:** Helmet, Compression, API Rate Limiting (Throttler), Cache-Manager
-* **Tối ưu DB:** Đã cấu hình Composite Indexes và Unique Constraints để chống Race Condition.
+* **Core:** NestJS 11, TypeScript (Kiến trúc Controller-Service-Module cực kỳ Clean).
+* **Database & ORM:** PostgreSQL 16, Prisma ORM (Type-safe query).
+* **Authentication:** Passport, JWT (JSON Web Tokens) với cơ chế Access/Refresh Token bảo mật cao.
+* **Hiệu năng & Bảo mật:**
+  - Helmet (Security headers).
+  - Compression (Nén response).
+  - Throttler (API Rate Limiting chống DDoS).
+  - Cache-Manager (Tối ưu truy vấn).
+* **Tối ưu Cơ sở dữ liệu:**
+  - Đã đánh **Composite Indexes** (`@@index`) cho các bảng dữ liệu lớn (Orders, Transactions).
+  - Sử dụng **Unique Constraints** (`@@unique([userId, productId])`, `@@unique([userId, couponId])`) để chặn lỗi Race Condition từ cấp độ Database.
 
 ---
 
@@ -72,10 +88,10 @@ Chào mừng bạn đến với dự án **Tech E-Commerce Platform** - một n�
 
 ### 1. Yêu cầu môi trường
 - Node.js (v18.x trở lên)
-- PostgreSQL (Đã cài đặt local hoặc sử dụng dịch vụ Cloud như Neon/Supabase)
+- PostgreSQL (Local hoặc Neon/Supabase)
 
 ### 2. Cài đặt Backend
-Di chuyển vào thư mục `backend`:
+Mở terminal, di chuyển vào thư mục `backend`:
 ```bash
 cd backend
 npm install
@@ -88,7 +104,7 @@ JWT_SECRET="your-super-secret-jwt-key"
 PORT=3000
 ```
 
-Khởi tạo Database và Seed dữ liệu mẫu:
+Khởi tạo Database và Seed dữ liệu mẫu (Sản phẩm công nghệ, User admin):
 ```bash
 npx prisma db push
 npm run seed:excel
@@ -115,13 +131,18 @@ npm run dev
 
 ---
 
-## 🏗️ Cấu trúc thư mục
+## 📁 Cấu trúc thư mục
 
 ```text
 EcommerceWeb/
 ├── backend/                  # NestJS API Server
-│   ├── prisma/               # Schema, Migrations & Seeders
-│   ├── src/                  # Controllers, Services, Modules (Domain Driven)
+│   ├── prisma/               # Schema, Migrations & Seeders (Excel Data)
+│   ├── src/                  
+│   │   ├── auth/             # Xác thực (JWT, Guards)
+│   │   ├── product/          # API Sản phẩm, Biến thể, Danh mục
+│   │   ├── order/            # API Đơn hàng, Checkout
+│   │   ├── inventory/        # Logic ERP quản lý kho hàng
+│   │   └── settings/         # Cấu hình website động
 │   └── uploads/              # Lưu trữ hình ảnh tĩnh (Logo, Banners)
 │
 └── frontend/                 # React UI Application
@@ -129,17 +150,9 @@ EcommerceWeb/
     │   ├── api/              # Axios instance setup
     │   ├── components/       # Reusable UI components (Navbar, Footer, ProductCard)
     │   ├── pages/            # Page layouts (Home, Admin, Product Details)
-    │   └── store/            # Zustand global state (Auth, Cart, Compare, Settings)
+    │   └── store/            # Zustand global state (Auth, Cart, Compare)
     └── index.css             # Tailwind v4 configuration & Custom Animations
 ```
-
----
-
-## 💡 Lưu ý
-
-- **Tài khoản mặc định:** Sau khi chạy Seed, bạn có thể kiểm tra file `backend/src/prisma/seed.ts` để lấy tài khoản Admin mặc định.
-- **Upload Hình ảnh:** Các hình ảnh hệ thống (Logo, Banner) được quản lý qua `SettingsController` và lưu tại thư mục `backend/uploads`. Chúng được phục vụ dưới dạng file tĩnh `/uploads/...`.
-- **Đồng bộ Schema:** Nếu bạn có thay đổi cấu trúc Database (`schema.prisma`), hãy nhớ chạy `npx prisma generate` và `npx prisma db push` để cập nhật.
 
 <br />
 <div align="center">
