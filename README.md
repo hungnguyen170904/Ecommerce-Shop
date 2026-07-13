@@ -1,160 +1,144 @@
 <div align="center">
-  <h1>🛒 Tech E-Commerce Platform</h1>
-  <p>Hệ thống bán hàng trực tuyến thiết bị công nghệ toàn diện với kiến trúc Micro-services ready, ERP tích hợp và giao diện Modern Web 2025.</p>
+  <h1>Tech E-Commerce Platform</h1>
+  <p>Hệ thống Thương mại điện tử B2C chuyên kinh doanh thiết bị công nghệ. Tích hợp phân hệ ERP quản lý kho, hệ thống khuyến mãi động và Trợ lý ảo AI.</p>
 
-  <!-- Badges -->
   <p>
-    <img src="https://img.shields.io/badge/React-19-blue.svg?style=for-the-badge&logo=react" alt="React" />
-    <img src="https://img.shields.io/badge/Vite-5.0-646CFF.svg?style=for-the-badge&logo=vite" alt="Vite" />
-    <img src="https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC.svg?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" />
-    <img src="https://img.shields.io/badge/NestJS-11-E0234E.svg?style=for-the-badge&logo=nestjs" alt="NestJS" />
-    <img src="https://img.shields.io/badge/Prisma-ORM-2D3748.svg?style=for-the-badge&logo=prisma" alt="Prisma" />
-    <img src="https://img.shields.io/badge/PostgreSQL-16-336791.svg?style=for-the-badge&logo=postgresql" alt="PostgreSQL" />
+    <img src="https://img.shields.io/badge/React-19-blue.svg?style=flat-square&logo=react" alt="React" />
+    <img src="https://img.shields.io/badge/Vite-5.0-646CFF.svg?style=flat-square&logo=vite" alt="Vite" />
+    <img src="https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC.svg?style=flat-square&logo=tailwind-css" alt="Tailwind CSS" />
+    <img src="https://img.shields.io/badge/NestJS-11-E0234E.svg?style=flat-square&logo=nestjs" alt="NestJS" />
+    <img src="https://img.shields.io/badge/Prisma-ORM-2D3748.svg?style=flat-square&logo=prisma" alt="Prisma" />
+    <img src="https://img.shields.io/badge/PostgreSQL-16-336791.svg?style=flat-square&logo=postgresql" alt="PostgreSQL" />
+    <img src="https://img.shields.io/badge/Gemini_AI-Flash-8E75B2.svg?style=flat-square&logo=google" alt="Gemini AI" />
   </p>
 </div>
 
-<br />
+---
 
-Chào mừng bạn đến với dự án **Tech E-Commerce Platform** - một nền tảng thương mại điện tử cấp độ doanh nghiệp (Enterprise-level), được thiết kế đặc biệt cho việc kinh doanh các thiết bị công nghệ (Điện thoại, Laptop, Tai nghe, Smartwatch...). Hệ thống không chỉ có giao diện tuyệt đẹp (UX/UI tối ưu) mà còn sở hữu một Backend mạnh mẽ với các module quản lý kho (ERP), điểm thưởng (Loyalty) và mã giảm giá (Coupon) phức tạp.
+## 1. Tổng quan hệ thống (System Overview)
+
+Dự án là một nền tảng thương mại điện tử cấp độ doanh nghiệp, được thiết kế theo kiến trúc Module hóa (Clean Architecture) trên Backend và Component-based UI trên Frontend. Trọng tâm của hệ thống giải quyết các bài toán cốt lõi trong vận hành E-Commerce: xử lý giao dịch đồng thời (concurrency), quản lý vòng đời tồn kho (inventory lifecycle), phân quyền bảo mật và tích hợp AI nâng cao trải nghiệm mua sắm.
 
 ---
 
-## 📑 Mục lục
+## 2. Các module & Chức năng cốt lõi (Core Modules)
 
-- [🌟 Chức năng cốt lõi (Core Features)](#-chức-năng-cốt-lõi-core-features)
-- [🏗️ Kiến trúc & Công nghệ](#-kiến-trúc--công-nghệ)
-- [🚀 Hướng dẫn cài đặt](#-hướng-dẫn-cài-đặt)
-- [📁 Cấu trúc thư mục](#-cấu-trúc-thư-mục)
+### 2.1. Xác thực & Phân quyền (Auth & Security)
+- **JWT Authentication:** Cơ chế Access Token & Refresh Token an toàn.
+- **Role-based Access Control (RBAC):** Phân định rõ ràng quyền `USER` và `ADMIN`.
+- **User Profile:** Quản lý sổ địa chỉ (Multiple Addresses), lịch sử tích điểm (Loyalty Points) và hạng thành viên.
 
----
+### 2.2. Quản lý Danh mục & Sản phẩm (Catalog Management)
+- **Cấu trúc dữ liệu linh hoạt:** Hỗ trợ Danh mục đa cấp (Nested Categories) và Thương hiệu (Brands).
+- **Hệ thống Biến thể (Variants):** Mỗi sản phẩm có nhiều biến thể độc lập với SKU, giá bán (price override), kích thước và màu sắc riêng biệt.
+- **Tối ưu hiển thị:** Tích hợp Skeleton Loading, Promise.all cho luồng fetch dữ liệu, UI Glassmorphism hiện đại.
 
-## 🌟 Chức năng cốt lõi (Core Features)
+### 2.3. Giỏ hàng & Xử lý Đơn hàng (Cart & Order Processing)
+- **Kiểm tra tồn kho thời gian thực (Real-time Inventory Check):** Chặn đặt hàng vượt quá số lượng tồn kho (Race-condition protection).
+- **Vòng đời đơn hàng (Order Lifecycle):** Quản lý trạng thái chi tiết (`PENDING` -> `PROCESSING` -> `SHIPPED` -> `DELIVERED`).
+- **Giao vận (Shipment):** Theo dõi mã vận đơn (Tracking number), phí ship và trạng thái giao hàng.
+- **Thanh toán (Payment):** Hỗ trợ nhiều phương thức (COD, Chuyển khoản QR với Provider Ref ID). Theo dõi giao dịch (Payment Transactions).
 
-### 🛍️ Storefront (Dành cho Khách hàng)
-- **UI/UX Đột phá:** Giao diện **Modern Web 2025** với Glassmorphism, Hero Slider mượt mà, hiệu ứng nổi (shimmer/float) và Skeleton Loading chuyên nghiệp. Đảm bảo tốc độ tải trang cực nhanh nhờ cơ chế fetch API song song (Promise.all).
-- **Trải nghiệm mua sắm:**
-  - Danh mục sản phẩm công nghệ đa dạng với bộ lọc thông minh (Brand, Category).
-  - Chi tiết sản phẩm với hệ thống **Biến thể (Variants)** phức tạp (Màu sắc, Dung lượng, SKU riêng biệt, Giá tùy chỉnh).
-  - So sánh sản phẩm (Compare) và Danh sách yêu thích (Wishlist).
-- **Giỏ hàng & Thanh toán:**
-  - Kiểm tra tồn kho **Real-time** ngay khi người dùng thao tác thêm vào giỏ hoặc thanh toán.
-  - Hỗ trợ nhiều phương thức thanh toán (COD, Chuyển khoản QR Code với Provider Ref ID).
-- **Tương tác & Khuyến mãi:**
-  - Hệ thống áp dụng **Coupon thông minh** (Giảm theo % hoặc số tiền cố định, giới hạn lượt dùng toàn hệ thống, tự động chặn spam).
-  - Đánh giá sản phẩm (Review) với ràng buộc dữ liệu chặt chẽ (1 user chỉ được đánh giá 1 lần cho 1 sản phẩm).
-  - Tích điểm thưởng (Loyalty Points) và Hạng thành viên (Tiers).
-- **Cá nhân hóa:** Quản lý sổ địa chỉ giao hàng (Multiple Addresses), lịch sử đơn hàng chi tiết và hệ thống thông báo trong ứng dụng (In-app Notifications).
+### 2.4. Phân hệ ERP Quản lý Kho (Inventory Management)
+- **Đa điểm kho (Multi-warehouse):** Hỗ trợ khai báo nhiều kho hàng.
+- **Nhà cung cấp & Nhập hàng (Suppliers & PO):** Tạo Đơn đặt hàng (Purchase Orders) từ nhà cung cấp.
+- **Sổ cái tồn kho (Inventory Transactions):** Không trừ số lượng đơn thuần. Mọi thay đổi tồn kho đều được ghi nhận dạng Log (`IN`, `OUT`, `ADJUSTMENT`) đảm bảo tính minh bạch và dễ dàng truy xuất (Audit).
 
-### 🏢 Admin Panel & ERP (Dành cho Quản trị viên)
-- **Dashboard Thống kê:** Báo cáo doanh thu, số lượng đơn hàng, và tăng trưởng khách hàng theo thời gian thực.
-- **Quản lý Kho hàng (Inventory ERP):**
-  - Quản lý đa kho (Warehouses).
-  - Quản lý Nhà cung cấp (Suppliers) và Tạo Đơn đặt hàng nhập kho (Purchase Orders - PO).
-  - Ghi nhận lịch sử giao dịch kho (Inventory Transactions: IN, OUT, ADJUSTMENT) để đảm bảo tính toàn vẹn dữ liệu, không dùng phép tính trừ đơn thuần.
-- **Quản lý Đơn hàng & Vận chuyển:**
-  - Theo dõi vòng đời đơn hàng (Pending -> Processing -> Shipped -> Delivered -> Cancelled).
-  - Tích hợp Module Giao hàng (Shipment) với Mã vận đơn (Tracking Number) và Đơn vị vận chuyển (Courier).
-  - Quy trình hoàn trả hàng (Return/Refund) chuẩn chỉ.
-- **Quản lý Hệ thống (Dynamic Settings):**
-  - Thay đổi cấu hình trang web (Tên Website, Logo, Banner quảng cáo) trực tiếp trên giao diện Admin, không cần can thiệp code. (Sử dụng module Upload File lưu trữ tại backend).
+### 2.5. Tương tác & Khuyến mãi (Promotions & Engagement)
+- **Mã giảm giá (Coupon Engine):** Hỗ trợ giảm theo % hoặc số tiền cố định. Có giới hạn lượt dùng hệ thống (`usageLimit`), áp dụng min-order, tự động chặn sử dụng mã nhiều lần (1 user/1 mã).
+- **Hệ thống Đánh giá (Reviews):** Ràng buộc cấp Database (Unique Constraint) đảm bảo 1 user chỉ được đánh giá 1 lần trên 1 sản phẩm (chống Spam).
+- **In-app Notifications:** Đẩy thông báo hệ thống, trạng thái đơn hàng tới người dùng.
+
+### 2.6. Trợ lý ảo AI (AI Chatbot Integration)
+- **Kiến trúc RAG (Retrieval-Augmented Generation) cơ bản:** Sử dụng Google Gemini AI (3.5 Flash).
+- **Context-aware:** Tự động lấy danh sách sản phẩm nổi bật (Top 10) từ Database, nhúng vào System Prompt để AI tư vấn chính xác tên, giá và tình trạng hàng hóa.
+- **Xử lý linh hoạt:** Tư vấn sản phẩm thay thế khi hết hàng, giải đáp chính sách bảo hành, đổi trả tự động. Hỗ trợ Fallback (Mock Mode) khi thiếu API Key.
 
 ---
 
-## 🏗️ Kiến trúc & Công nghệ
+## 3. Kiến trúc Công nghệ (Tech Stack)
 
-### Frontend (Client-side)
-* **Core:** React 19, TypeScript, Vite (Tốc độ build siêu tốc).
-* **Styling:** Tailwind CSS v4 (Custom Theme Tokens: `color-brand-bg`, `shadow-soft`, animations custom).
-* **State Management:** Zustand (Nhẹ, dễ scale cho Auth, Cart, Compare).
-* **Network & Data:** Axios (Interceptors xử lý Refresh Token, Authorization).
-* **Icons & Animation:** Lucide React, Framer Motion.
+### Frontend (Client)
+- **Framework:** React 19 (TypeScript, Vite).
+- **State Management:** Zustand (Store phân mảnh: Auth, Cart, Compare, Settings).
+- **Network:** Axios (Interceptors xử lý logic Authentication JWT).
+- **Styling & UI:** Tailwind CSS v4, Lucide React (Icons), Framer Motion (Animations).
 
-### Backend (Server-side)
-* **Core:** NestJS 11, TypeScript (Kiến trúc Controller-Service-Module cực kỳ Clean).
-* **Database & ORM:** PostgreSQL 16, Prisma ORM (Type-safe query).
-* **Authentication:** Passport, JWT (JSON Web Tokens) với cơ chế Access/Refresh Token bảo mật cao.
-* **Hiệu năng & Bảo mật:**
-  - Helmet (Security headers).
-  - Compression (Nén response).
-  - Throttler (API Rate Limiting chống DDoS).
-  - Cache-Manager (Tối ưu truy vấn).
-* **Tối ưu Cơ sở dữ liệu:**
-  - Đã đánh **Composite Indexes** (`@@index`) cho các bảng dữ liệu lớn (Orders, Transactions).
-  - Sử dụng **Unique Constraints** (`@@unique([userId, productId])`, `@@unique([userId, couponId])`) để chặn lỗi Race Condition từ cấp độ Database.
+### Backend (Server)
+- **Framework:** NestJS 11 (TypeScript, Dependency Injection, Clean Architecture).
+- **Database & ORM:** PostgreSQL 16 + Prisma ORM.
+- **AI Integration:** `@google/generative-ai` (Gemini API).
+- **Performance & Security:**
+  - `Helmet` (Bảo mật HTTP Headers).
+  - `Throttler` (API Rate Limiting - chống DDoS).
+  - `Compression` (Nén Payload).
+  - `Cache-Manager` (In-memory caching).
+- **Database Optimization:** Sử dụng `Composite Indexes` và `Unique Constraints` ngăn chặn lỗi Race Condition (Ví dụ: `[userId, productId]` trong Review).
 
 ---
 
-## 🚀 Hướng dẫn cài đặt
+## 4. Hướng dẫn cài đặt (Installation Guide)
 
-### 1. Yêu cầu môi trường
-- Node.js (v18.x trở lên)
-- PostgreSQL (Local hoặc Neon/Supabase)
+### 4.1. Yêu cầu hệ thống
+- Node.js (v18.x+)
+- PostgreSQL (Local hoặc Cloud)
 
-### 2. Cài đặt Backend
-Mở terminal, di chuyển vào thư mục `backend`:
+### 4.2. Khởi chạy Backend
 ```bash
 cd backend
 npm install
 ```
 
-Tạo file `.env` ở thư mục `backend`:
+Tạo cấu hình `.env` trong thư mục `backend`:
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/ecommerce_db?schema=public"
 JWT_SECRET="your-super-secret-jwt-key"
 PORT=3000
+GEMINI_API_KEY="your-google-gemini-api-key" # Tùy chọn (Cho tính năng Chatbot)
 ```
 
-Khởi tạo Database và Seed dữ liệu mẫu (Sản phẩm công nghệ, User admin):
+Tạo lược đồ cơ sở dữ liệu và nạp dữ liệu mẫu:
 ```bash
 npx prisma db push
 npm run seed:excel
 ```
 
-Chạy server Backend:
+Chạy Server:
 ```bash
 npm run start:dev
 ```
-*API sẽ chạy tại: `http://localhost:3000`*
+*(API khởi chạy tại: `http://localhost:3000`)*
 
-### 3. Cài đặt Frontend
-Mở một terminal mới, di chuyển vào thư mục `frontend`:
+### 4.3. Khởi chạy Frontend
 ```bash
 cd frontend
 npm install
-```
-
-Chạy server Frontend:
-```bash
 npm run dev
 ```
-*Giao diện sẽ chạy tại: `http://localhost:5173`*
+*(Ứng dụng khởi chạy tại: `http://localhost:5173`)*
 
 ---
 
-## 📁 Cấu trúc thư mục
+## 5. Cấu trúc thư mục mã nguồn (Directory Structure)
 
 ```text
 EcommerceWeb/
-├── backend/                  # NestJS API Server
-│   ├── prisma/               # Schema, Migrations & Seeders (Excel Data)
+├── backend/
+│   ├── prisma/               # Schema định nghĩa Database, Migrations & Dữ liệu Seed
 │   ├── src/                  
-│   │   ├── auth/             # Xác thực (JWT, Guards)
-│   │   ├── product/          # API Sản phẩm, Biến thể, Danh mục
-│   │   ├── order/            # API Đơn hàng, Checkout
-│   │   ├── inventory/        # Logic ERP quản lý kho hàng
-│   │   └── settings/         # Cấu hình website động
-│   └── uploads/              # Lưu trữ hình ảnh tĩnh (Logo, Banners)
+│   │   ├── auth/             # Logic xác thực JWT, Phân quyền Guards
+│   │   ├── chatbot/          # Module tích hợp Gemini AI Chatbot
+│   │   ├── inventory/        # Module quản lý kho ERP (Transactions, PO)
+│   │   ├── order/            # Vòng đời đơn hàng, Checkout, Giao vận
+│   │   ├── product/          # Quản lý danh mục, biến thể sản phẩm, đánh giá
+│   │   └── settings/         # Quản lý cấu hình động (Logo, Banner)
+│   └── uploads/              # Lưu trữ File tĩnh (Local storage)
 │
-└── frontend/                 # React UI Application
+└── frontend/
     ├── src/
-    │   ├── api/              # Axios instance setup
-    │   ├── components/       # Reusable UI components (Navbar, Footer, ProductCard)
-    │   ├── pages/            # Page layouts (Home, Admin, Product Details)
-    │   └── store/            # Zustand global state (Auth, Cart, Compare)
-    └── index.css             # Tailwind v4 configuration & Custom Animations
+    │   ├── api/              # Tầng giao tiếp mạng (Axios Instance)
+    │   ├── components/       # UI Components tái sử dụng (Chatbot, Navbar, Card...)
+    │   ├── pages/            # View Controller cho các Route (Home, Admin, Cart...)
+    │   └── store/            # Tầng quản lý trạng thái toàn cục (Zustand)
+    └── index.css             # Tailwind Design Tokens & Utilities
 ```
-
-<br />
-<div align="center">
-  <i>Được phát triển với niềm đam mê mang lại trải nghiệm thương mại điện tử hoàn hảo!</i>
-</div>
